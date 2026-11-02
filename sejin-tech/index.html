@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>세진테크 SEJIN TECH</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="세진테크 — 첨단 장비를 위한 와이어·케이블·몰딩 하네스 주문 생산. Since 1997, 경기도 안양.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: signal-path concept. Harness = the wiring that carries intelligence between machines.
+   Dark-first: graphite field, "signal" cyan as the one bright accent, copper only on terminal nodes. */
+:root{
+  --bg:#06090F;          /* graphite field */
+  --bg-2:#0B111B;
+  --surface:#101826;
+  --line:#1C2738;
+  --line-2:#2A3A52;
+  --ink:#E7EDF6;
+  --muted:#8C9AB0;
+  --signal:#38C8F0;      /* signal cyan */
+  --signal-dim:rgba(56,200,240,.14);
+  --node:#F08A4B;        /* copper terminal */
+  --ok:#4FD39A; --err:#FF7A6E;
+  --on-signal:#04121A;
+  --f-display:"Michroma","IBM Plex Sans KR",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --maxw:1180px;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#EEF2F7;--bg-2:#E4EAF2;--surface:#FFFFFF;--line:#D3DCE7;--line-2:#B9C6D6;
+  --ink:#0A1422;--muted:#56657A;--signal:#0A86B8;--signal-dim:rgba(10,134,184,.10);--node:#C9621F;
+  --ok:#1E8A5A;--err:#C0392B;--on-signal:#FFFFFF;color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#EEF2F7;--bg-2:#E4EAF2;--surface:#FFFFFF;--line:#D3DCE7;--line-2:#B9C6D6;
+  --ink:#0A1422;--muted:#56657A;--signal:#0A86B8;--signal-dim:rgba(10,134,184,.10);--node:#C9621F;
+  --ok:#1E8A5A;--err:#C0392B;--on-signal:#FFFFFF;color-scheme:light}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+html[lang="ko"] .en{display:none!important}
+html[lang="en"] .ko{display:none!important}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:2px}
+h1,h2,h3{text-wrap:balance;margin:0;line-height:1.3;font-weight:600}
+p{margin:0}
+.mono{font-family:var(--f-mono)}
+.label{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--signal);display:flex;align-items:center;gap:10px}
+.label::before{content:"";width:7px;height:7px;border:1.5px solid var(--signal);border-radius:50%}
+
+/* header */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:20px;min-height:66px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0}
+.brand svg{width:34px;height:34px;display:block}
+.brand .wm{font-family:var(--f-display);font-size:14px;letter-spacing:.22em;line-height:1}
+.brand .wm small{display:block;font-family:var(--f-body);font-size:10.5px;letter-spacing:.32em;color:var(--muted);margin-top:5px}
+nav.menu{display:flex;gap:2px;margin-left:auto}
+nav.menu a{text-decoration:none;font-size:14.5px;font-weight:500;padding:8px 13px;border-radius:4px;color:var(--muted)}
+nav.menu a:hover{color:var(--ink);background:var(--signal-dim)}
+.lang{display:flex;border:1px solid var(--line-2);border-radius:4px;overflow:hidden;flex-shrink:0}
+.lang button{font:500 11.5px var(--f-mono);letter-spacing:.1em;background:none;border:0;color:var(--muted);padding:7px 10px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--signal);color:var(--on-signal)}
+.burger{display:none;margin-left:auto;background:none;border:1px solid var(--line-2);border-radius:4px;width:40px;height:40px;cursor:pointer;color:var(--ink)}
+@media (max-width:880px){
+  nav.menu{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;background:var(--bg);border-bottom:1px solid var(--line);padding:8px max(20px,env(safe-area-inset-right,0px)) 16px max(20px,env(safe-area-inset-left,0px))}
+  nav.menu.open{display:flex}
+  .burger{display:block}
+}
+
+/* hero */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:
+  radial-gradient(800px 420px at 85% 30%,var(--signal-dim),transparent 70%),var(--bg)}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:48px 48px;opacity:.35;mask-image:linear-gradient(90deg,transparent,#000 55%);-webkit-mask-image:linear-gradient(90deg,transparent,#000 55%)}
+#wires{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+.hero .wrap{position:relative;z-index:2;padding-block:96px 104px}
+.hero-copy{max-width:640px}
+.hero h1{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,5.4vw,60px);letter-spacing:.02em;line-height:1.18;margin-top:22px}
+.hero h1 .ko-h{font-family:var(--f-body);font-weight:700;letter-spacing:-.01em;line-height:1.3}
+.hero h1 em{font-style:normal;color:var(--signal)}
+.hero .lead{font-size:18px;color:var(--muted);margin-top:24px;max-width:34em;font-weight:300}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+.btn{display:inline-flex;align-items:center;gap:10px;font:600 15px var(--f-body);text-decoration:none;padding:14px 22px;border-radius:4px;border:1px solid transparent;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.btn.primary{background:var(--signal);color:var(--on-signal)}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.ghost{border-color:var(--line-2);color:var(--ink);background:color-mix(in srgb,var(--bg) 60%,transparent)}
+.btn.ghost:hover{border-color:var(--signal);color:var(--signal)}
+.readout{display:grid;grid-template-columns:repeat(3,auto);gap:10px 36px;margin-top:56px;padding-top:22px;border-top:1px solid var(--line);width:fit-content;max-width:100%}
+.readout div{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.readout b{display:block;font-family:var(--f-display);font-weight:400;font-size:22px;letter-spacing:.04em;color:var(--ink);margin-top:6px;text-transform:none}
+.readout b i{font-style:normal;color:var(--signal)}
+@media (max-width:640px){.hero .wrap{padding-block:64px 72px}.readout{grid-template-columns:1fr 1fr;gap:18px 28px}}
+
+/* sections */
+section.band{padding-block:100px}
+.sec-head{display:grid;grid-template-columns:1fr 1.15fr;gap:40px;align-items:end;margin-bottom:52px}
+.sec-head h2{font-size:clamp(26px,3.6vw,38px);margin-top:16px;letter-spacing:-.01em}
+.sec-head p{color:var(--muted);max-width:34em}
+@media (max-width:780px){.sec-head{grid-template-columns:1fr;gap:14px}section.band{padding-block:72px}}
+
+/* about */
+.about-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:56px}
+.about-grid .msg{font-size:18px;line-height:1.9;font-weight:300}
+.about-grid .msg p+p{margin-top:18px}
+.about-grid .msg strong{font-weight:600;color:var(--ink)}
+.sign{margin-top:30px;font-size:14px;color:var(--muted)}
+.sign b{color:var(--ink);font-weight:600;font-size:17px;margin-left:8px}
+.spec{border:1px solid var(--line);border-radius:6px;background:var(--surface);overflow:hidden}
+.spec .hd{display:flex;justify-content:space-between;font:500 11px var(--f-mono);letter-spacing:.14em;color:var(--muted);padding:12px 18px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+.spec .hd span:last-child{color:var(--ok)}
+.spec dl{margin:0;display:grid;grid-template-columns:auto 1fr}
+.spec dt,.spec dd{padding:14px 18px;border-bottom:1px solid var(--line);margin:0}
+.spec dt{font:500 11px var(--f-mono);letter-spacing:.12em;color:var(--muted);text-transform:uppercase;padding-top:17px}
+.spec dd{font-weight:500;font-variant-numeric:tabular-nums}
+.spec dl > :nth-last-child(-n+2){border-bottom:0}
+@media (max-width:780px){.about-grid{grid-template-columns:1fr;gap:40px}}
+
+/* fields */
+.fields{background:var(--bg-2);border-block:1px solid var(--line)}
+.f-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line-2);border-left:1px solid var(--line)}
+.f-item{padding:26px 22px 28px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px;min-width:0}
+.f-item svg{width:40px;height:40px;color:var(--signal)}
+.f-item .code{font:500 11px var(--f-mono);letter-spacing:.12em;color:var(--muted)}
+.f-item h3{font-size:17px}
+.f-item p{font-size:14px;color:var(--muted)}
+@media (max-width:900px){.f-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.f-grid{grid-template-columns:1fr}}
+
+/* products */
+.p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.p-card{border:1px solid var(--line);border-radius:6px;background:var(--surface);display:flex;flex-direction:column;overflow:hidden;transition:border-color .25s}
+.p-card:hover{border-color:var(--signal)}
+.p-card figure{margin:0;aspect-ratio:16/10;max-width:100%;border-bottom:1px solid var(--line);background:
+  linear-gradient(var(--line) 1px,transparent 1px) 0 0/24px 24px,linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/24px 24px,var(--bg-2);display:grid;place-items:center}
+.p-card figure svg{width:84%;height:auto}
+.p-card .body{padding:22px 22px 26px;display:flex;flex-direction:column;gap:10px;flex:1}
+.p-card .code{font:500 11px var(--f-mono);letter-spacing:.14em;color:var(--signal)}
+.p-card h3{font-size:20px}
+.p-card h3 small{display:block;font-family:var(--f-display);font-weight:400;font-size:10.5px;color:var(--muted);letter-spacing:.18em;margin-top:6px}
+.p-card p{color:var(--muted);font-size:15px}
+.p-card ul{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.p-card li{font:500 11.5px var(--f-mono);letter-spacing:.02em;border:1px solid var(--line-2);border-radius:3px;padding:3px 8px;color:var(--muted)}
+@media (max-width:920px){.p-grid{grid-template-columns:1fr}.p-card{flex-direction:row}.p-card figure{aspect-ratio:auto;width:40%;border-bottom:0;border-right:1px solid var(--line)}}
+@media (max-width:560px){.p-card{flex-direction:column}.p-card figure{width:100%;aspect-ratio:16/9;border-right:0;border-bottom:1px solid var(--line)}}
+.note{margin-top:26px;font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:baseline}
+.note::before{content:"";flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--node);transform:translateY(-2px)}
+
+/* process: a signal line with nodes */
+.process{background:var(--bg-2);border-block:1px solid var(--line)}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);position:relative}
+.steps::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:linear-gradient(90deg,var(--signal),var(--line-2))}
+.steps li{position:relative;padding:36px 22px 0 0}
+.steps li::before{content:"";position:absolute;top:0;left:0;width:16px;height:16px;border-radius:50%;background:var(--bg-2);border:2px solid var(--signal);box-shadow:0 0 0 4px var(--bg-2)}
+.steps li:last-child::before{border-color:var(--node)}
+.steps .n{font:500 11px var(--f-mono);letter-spacing:.14em;color:var(--muted)}
+.steps h3{font-size:18px;margin-top:6px}
+.steps p{font-size:14px;color:var(--muted);margin-top:6px}
+@media (max-width:900px){
+  .steps{grid-template-columns:1fr;gap:28px;padding-left:30px}
+  .steps::before{left:7px;right:auto;top:0;bottom:0;width:2px;height:auto;background:linear-gradient(180deg,var(--signal),var(--line-2))}
+  .steps li{padding:0}
+  .steps li::before{left:-30px;top:4px}
+}
+
+/* order */
+.order-grid{display:grid;grid-template-columns:.8fr 1.4fr;gap:48px;align-items:start}
+.contact-card{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:24px;display:grid;gap:18px}
+.contact-card dt{font:500 11px var(--f-mono);letter-spacing:.14em;color:var(--muted)}
+.contact-card dd{margin:4px 0 0;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:10px;flex-wrap:wrap;word-break:break-all}
+.copy{font:500 10.5px var(--f-mono);letter-spacing:.08em;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:3px;padding:3px 8px;cursor:pointer}
+.copy:hover{color:var(--signal);border-color:var(--signal)}
+form.order{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:32px;display:grid;grid-template-columns:1fr 1fr;gap:18px 20px;position:relative}
+form.order .full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field > label{font-size:14px;font-weight:600}
+.req{color:var(--signal);margin-left:3px}
+.field input,.field select,.field textarea{font:400 15px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line-2);border-radius:4px;padding:11px 12px;width:100%}
+.field textarea{min-height:130px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--signal);box-shadow:0 0 0 3px var(--signal-dim)}
+.hint{font-size:12px;color:var(--muted)}
+.field.invalid input,.field.invalid select,.field.invalid textarea{border-color:var(--err)}
+.err-msg{font-size:12px;color:var(--err)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{display:flex;align-items:center;gap:6px;font-weight:500;font-size:14px;border:1px solid var(--line-2);border-radius:4px;padding:7px 14px;cursor:pointer}
+.chips input{accent-color:var(--signal)}
+.chips label:has(input:checked){border-color:var(--signal);color:var(--signal);background:var(--signal-dim)}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.agree input{accent-color:var(--signal);margin-top:4px}
+.agree.invalid{color:var(--err)}
+.form-foot{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.form-foot .alt{font-size:13px;color:var(--muted)}
+.status{border-radius:4px;padding:16px 18px;font-size:14px;line-height:1.6}
+.status.ok{background:color-mix(in srgb,var(--ok) 12%,var(--surface));border:1px solid var(--ok)}
+.status.fail{background:var(--signal-dim);border:1px solid var(--signal)}
+.status pre{white-space:pre-wrap;font:12px/1.6 var(--f-mono);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:12px;margin:10px 0;max-height:220px;overflow:auto}
+@media (max-width:880px){.order-grid{grid-template-columns:1fr}form.order{grid-template-columns:1fr;padding:22px}}
+
+/* location */
+.loc-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:44px;align-items:center}
+.addr{font-size:22px;font-weight:600;line-height:1.5;margin-top:18px}
+.addr small{display:block;font-size:14px;color:var(--muted);font-weight:400;margin-top:6px}
+.maplinks{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.map-art{border:1px solid var(--line);border-radius:6px;background:var(--bg-2);aspect-ratio:16/10;max-width:100%;overflow:hidden}
+.map-art svg{width:100%;height:100%;display:block}
+@media (max-width:780px){.loc-grid{grid-template-columns:1fr}}
+
+footer{border-top:1px solid var(--line);background:var(--bg-2);color:var(--muted);font-size:13px}
+footer .wrap{padding-block:44px calc(44px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between;align-items:flex-start}
+footer .fb{display:flex;gap:14px;align-items:flex-start}
+footer .fb svg{width:30px;height:30px;flex-shrink:0}
+footer b{color:var(--ink);font-family:var(--f-display);font-weight:400;letter-spacing:.2em;font-size:12px}
+footer p{margin-top:6px}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- SEJIN TECH mark: one continuous signal trace forming an S, two terminal nodes -->
+    <symbol id="mark" viewBox="0 0 40 40">
+      <path d="M31 9 H14 L9 14 V16 L13 20 H27 L31 24 V26 L26 31 H9" fill="none" stroke="var(--signal)" stroke-width="3.2" stroke-linecap="square" stroke-linejoin="miter"/>
+      <circle cx="31" cy="9" r="3.4" fill="var(--bg)" stroke="var(--signal)" stroke-width="2.4"/>
+      <circle cx="9" cy="31" r="3.4" fill="var(--node)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="SEJIN TECH 홈">
+      <svg aria-hidden="true"><use href="#mark"/></svg>
+      <span class="wm">SEJIN TECH<small>세진테크</small></span>
+    </a>
+    <nav class="menu" id="menu">
+      <a href="#about"><span class="ko">회사소개</span><span class="en">Company</span></a>
+      <a href="#fields"><span class="ko">대응 분야</span><span class="en">Industries</span></a>
+      <a href="#products"><span class="ko">제품</span><span class="en">Products</span></a>
+      <a href="#process"><span class="ko">주문 절차</span><span class="en">Process</span></a>
+      <a href="#order"><span class="ko">견적·주문</span><span class="en">Quote &amp; Order</span></a>
+      <a href="#location"><span class="ko">오시는 길</span><span class="en">Location</span></a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" id="lang-ko" data-lang="ko" aria-pressed="true">KO</button>
+      <button type="button" id="lang-en" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <button class="burger" id="burger" type="button" aria-label="메뉴" aria-expanded="false" aria-controls="menu">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <canvas id="wires" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="hero-copy">
+        <div class="label">Precision Harness Engineering</div>
+        <h1>
+          <span class="ko ko-h">기계와 기계 사이,<br><em>신호를 잇는</em> 하네스</span>
+          <span class="en">Connecting<br><em>intelligent</em> machines.</span>
+        </h1>
+        <p class="lead">
+          <span class="ko">로봇, 자동화 설비, 첨단 장비의 성능은 그 안을 흐르는 신호와 전력의 품질에서 시작됩니다. 세진테크는 1997년부터 축적한 정밀 가공 기술로 고객 사양에 꼭 맞는 하네스를 만듭니다.</span>
+          <span class="en">The performance of robots, automation lines and advanced equipment starts with the quality of the power and signals running through them. Since 1997, SEJIN TECH has built harnesses precisely to customer specification.</span>
+        </p>
+        <div class="cta">
+          <a class="btn primary" href="#order"><span class="ko">견적·주문 요청</span><span class="en">Request a quote</span> <span aria-hidden="true">→</span></a>
+          <a class="btn ghost" href="#products"><span class="ko">제품 보기</span><span class="en">View products</span></a>
+        </div>
+        <div class="readout">
+          <div>Since<b>1997</b></div>
+          <div><span class="ko">제품군</span><span class="en">Product lines</span><b>W · C · <i>M</i></b></div>
+          <div><span class="ko">생산 방식</span><span class="en">Production</span><b><span class="ko">맞춤 주문</span><span class="en">Built to spec</span></b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="about">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="label">Company</div><h2><span class="ko">정밀함이 신뢰가 되는 회사</span><span class="en">Where precision becomes trust</span></h2></div>
+        <p><span class="ko">한 가닥의 전선, 하나의 압착 단자까지. 하네스 한 분야에 집중해 온 전문기업입니다.</span><span class="en">Down to every wire and every crimp. A specialist that has focused on harnesses alone.</span></p>
+      </div>
+      <div class="about-grid">
+        <div class="msg">
+          <div class="ko">
+            <p>세진테크는 <strong>1997년부터</strong> 기술과 신뢰를 바탕으로 성장해 온 하네스 전문기업입니다.</p>
+            <p>장비가 똑똑해질수록 내부 배선은 더 촘촘해지고, 작은 접촉 불량 하나가 전체 시스템을 멈추게 합니다. 그래서 세진테크는 오랜 경험으로 다져진 노하우와 철저한 품질 관리로, <strong>정확한 사양의 하네스를 제때 공급</strong>하는 일에 집중합니다.</p>
+            <p>함께 성장해 나갈 하네스 파트너가 필요하시다면, 세진테크가 함께하겠습니다.</p>
+          </div>
+          <div class="en">
+            <p>SEJIN TECH is a harness specialist that has grown on craftsmanship and reliability <strong>since 1997</strong>.</p>
+            <p>As equipment gets smarter, its wiring gets denser, and one poor contact can stop an entire system. That is why we focus on one thing: <strong>delivering harnesses built exactly to spec, on schedule</strong>, backed by decades of know-how and strict quality control.</p>
+            <p>If you need a harness partner to grow with, SEJIN TECH is ready.</p>
+          </div>
+          <p class="sign"><span class="ko">대표</span><span class="en">CEO</span><b><span class="ko">윤재훈</span><span class="en">Yun Jae-hoon</span></b></p>
+        </div>
+        <div class="spec">
+          <div class="hd"><span>COMPANY / SPEC</span><span>● ACTIVE</span></div>
+          <dl>
+            <dt>Name</dt><dd><span class="ko">세진테크</span><span class="en">SEJIN TECH</span></dd>
+            <dt>Since</dt><dd>1997</dd>
+            <dt>Business</dt><dd><span class="ko">하네스 설계·제조</span><span class="en">Harness manufacturing</span></dd>
+            <dt>Lines</dt><dd><span class="ko">와이어 · 케이블 · 몰딩 하네스</span><span class="en">Wire · Cable · Molded</span></dd>
+            <dt>Order</dt><dd><span class="ko">시제품 ~ 반복 양산</span><span class="en">Prototype to repeat production</span></dd>
+            <dt>Site</dt><dd><span class="ko">경기도 안양시 만안구</span><span class="en">Anyang, Gyeonggi-do, KR</span></dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band fields" id="fields">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="label">Industries</div><h2><span class="ko">첨단 장비가 있는 곳에</span><span class="en">Wherever advanced equipment runs</span></h2></div>
+        <p><span class="ko">신호와 전력을 안정적으로 전달해야 하는 다양한 장비의 하네스를 상담해 드립니다.</span><span class="en">We take on harness work for equipment that needs stable power and signal delivery.</span></p>
+      </div>
+      <div class="f-grid">
+        <div class="f-item">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="27" width="24" height="6" rx="1"/><path d="M20 27V19l8-6 4 4"/><circle cx="20" cy="19" r="2.5"/><circle cx="28" cy="13" r="2"/><path d="M32 17l2 3"/></svg>
+          <span class="code">FIELD 01</span>
+          <h3><span class="ko">로봇·자동화 설비</span><span class="en">Robotics &amp; automation</span></h3>
+          <p><span class="ko">반복 굴곡과 진동을 견디는 배선</span><span class="en">Wiring that survives repeated flexing and vibration</span></p>
+        </div>
+        <div class="f-item">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="12" y="12" width="16" height="16" rx="1.5"/><rect x="16" y="16" width="8" height="8"/><path d="M16 12V7M20 12V7M24 12V7M16 28v5M20 28v5M24 28v5M12 16H7M12 20H7M12 24H7M28 16h5M28 20h5M28 24h5"/></svg>
+          <span class="code">FIELD 02</span>
+          <h3><span class="ko">반도체·전자 장비</span><span class="en">Semiconductor &amp; electronics</span></h3>
+          <p><span class="ko">고밀도 커넥터와 정밀 가공</span><span class="en">High-density connectors, precise processing</span></p>
+        </div>
+        <div class="f-item">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="9" y="7" width="22" height="8" rx="1"/><rect x="9" y="17" width="22" height="8" rx="1"/><rect x="9" y="27" width="22" height="6" rx="1"/><circle cx="14" cy="11" r="1.2" fill="currentColor"/><circle cx="14" cy="21" r="1.2" fill="currentColor"/></svg>
+          <span class="code">FIELD 03</span>
+          <h3><span class="ko">통신·서버 장비</span><span class="en">Telecom &amp; server</span></h3>
+          <p><span class="ko">안정적인 신호 전달과 정리된 배선</span><span class="en">Stable signal paths, clean routing</span></p>
+        </div>
+        <div class="f-item">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="11" width="22" height="18" rx="2"/><path d="M30 17h3v6h-3"/><path d="M20 14l-4 7h5l-2 6 5-8h-5l2-5z" stroke-linejoin="round"/></svg>
+          <span class="code">FIELD 04</span>
+          <h3><span class="ko">전력·에너지 기기</span><span class="en">Power &amp; energy</span></h3>
+          <p><span class="ko">전류 용량에 맞는 전선·단자 선정</span><span class="en">Wire and terminals sized to current load</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="products">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="label">Products</div><h2><span class="ko">주문 생산 하네스</span><span class="en">Made-to-order harnesses</span></h2></div>
+        <p><span class="ko">도면, 샘플, 사양서 중 하나만 있으면 됩니다. 요청하시는 모든 하네스를 제작해 드립니다.</span><span class="en">A drawing, a sample or a spec sheet is all we need to build the harness you want.</span></p>
+      </div>
+      <div class="p-grid">
+        <article class="p-card">
+          <figure aria-hidden="true">
+            <svg viewBox="0 0 240 150">
+              <rect x="16" y="50" width="34" height="50" rx="3" fill="var(--surface)" stroke="var(--line-2)" stroke-width="1.5"/>
+              <rect x="190" y="50" width="34" height="50" rx="3" fill="var(--surface)" stroke="var(--line-2)" stroke-width="1.5"/>
+              <g fill="none" stroke-width="3" stroke-linecap="round">
+                <path d="M50 60 C100 60 120 72 190 60" stroke="var(--signal)"/>
+                <path d="M50 70 C100 70 125 80 190 70" stroke="var(--signal)" opacity=".7"/>
+                <path d="M50 80 C110 80 125 64 190 80" stroke="var(--signal)" opacity=".5"/>
+                <path d="M50 90 C100 92 135 96 190 90" stroke="var(--muted)" opacity=".6"/>
+              </g>
+              <rect x="112" y="56" width="10" height="40" rx="2" fill="var(--node)"/>
+              <circle cx="50" cy="60" r="3" fill="var(--signal)"/><circle cx="190" cy="60" r="3" fill="var(--signal)"/>
+            </svg>
+          </figure>
+          <div class="body">
+            <span class="code">LINE · W</span>
+            <h3><span class="ko">와이어 하네스</span><span class="en">Wire Harness</span><small>WIRE HARNESS</small></h3>
+            <p><span class="ko">여러 가닥의 전선을 커넥터·단자와 함께 하나로 묶어, 장비 내부 배선을 단순하고 안전하게 만듭니다.</span><span class="en">Multiple wires bundled with connectors and terminals for clean, safe internal wiring.</span></p>
+            <ul><li>CRIMPING</li><li>CONNECTOR ASSY</li><li>MARKING</li></ul>
+          </div>
+        </article>
+        <article class="p-card">
+          <figure aria-hidden="true">
+            <svg viewBox="0 0 240 150">
+              <path d="M18 75 H146" stroke="var(--line-2)" stroke-width="14" stroke-linecap="round"/>
+              <path d="M18 75 H146" stroke="var(--signal)" stroke-width="1.5" stroke-dasharray="3 9"/>
+              <rect x="142" y="64" width="12" height="22" rx="2" fill="var(--node)"/>
+              <g fill="none" stroke="var(--signal)" stroke-width="3" stroke-linecap="round">
+                <path d="M154 70 C176 70 182 40 206 40"/>
+                <path d="M154 75 H206" opacity=".7"/>
+                <path d="M154 80 C176 80 182 110 206 110" opacity=".5"/>
+              </g>
+              <g fill="var(--surface)" stroke="var(--line-2)" stroke-width="1.5">
+                <rect x="206" y="32" width="18" height="16" rx="2"/><rect x="206" y="67" width="18" height="16" rx="2"/><rect x="206" y="102" width="18" height="16" rx="2"/>
+              </g>
+            </svg>
+          </figure>
+          <div class="body">
+            <span class="code">LINE · C</span>
+            <h3><span class="ko">케이블 하네스</span><span class="en">Cable Harness</span><small>CABLE ASSEMBLY</small></h3>
+            <p><span class="ko">피복 케이블을 원하는 길이로 가공하고, 분기·커넥터 작업까지 마친 완제품으로 공급합니다.</span><span class="en">Jacketed cable cut to length, branched and terminated, delivered ready to install.</span></p>
+            <ul><li>CUT &amp; STRIP</li><li>BREAKOUT</li><li>CONTINUITY TEST</li></ul>
+          </div>
+        </article>
+        <article class="p-card">
+          <figure aria-hidden="true">
+            <svg viewBox="0 0 240 150">
+              <path d="M18 75 H108" stroke="var(--line-2)" stroke-width="12" stroke-linecap="round"/>
+              <path d="M18 75 H108" stroke="var(--signal)" stroke-width="1.5" stroke-dasharray="3 9"/>
+              <path d="M102 62 L148 52 H194 a10 10 0 0 1 10 10 V88 a10 10 0 0 1 -10 10 H148 L102 88 Z" fill="var(--surface)" stroke="var(--signal)" stroke-width="2"/>
+              <path d="M122 64 V86 M136 60 V90 M150 56 V94" stroke="var(--signal)" stroke-width="1.2" opacity=".45"/>
+              <rect x="204" y="62" width="18" height="26" rx="2" fill="var(--node)"/>
+            </svg>
+          </figure>
+          <div class="body">
+            <span class="code">LINE · M</span>
+            <h3><span class="ko">몰딩 하네스</span><span class="en">Molded Harness</span><small>OVERMOLDED</small></h3>
+            <p><span class="ko">커넥터와 케이블 연결부를 사출 몰딩으로 감싸, 진동·습기·당김에 강한 하네스를 만듭니다.</span><span class="en">Connector-to-cable joints sealed with overmolding to resist vibration, moisture and pull.</span></p>
+            <ul><li>OVERMOLDING</li><li>SEALED</li><li>STRAIN RELIEF</li></ul>
+          </div>
+        </article>
+      </div>
+      <p class="note"><span class="ko">소량 시제품부터 반복 양산까지 고객 사양에 맞춰 상담해 드립니다.</span><span class="en">From small prototype runs to repeat production, built to your specification.</span></p>
+    </div>
+  </section>
+
+  <section class="band process" id="process">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="label">Process</div><h2><span class="ko">문의에서 출하까지</span><span class="en">From inquiry to shipment</span></h2></div>
+        <p><span class="ko">한 담당자가 처음부터 끝까지 주문을 챙깁니다.</span><span class="en">One contact person follows your order from start to finish.</span></p>
+      </div>
+      <ol class="steps">
+        <li><span class="n">STEP 01</span><h3><span class="ko">문의 접수</span><span class="en">Inquiry</span></h3><p><span class="ko">도면·샘플·사양을 보내주세요.</span><span class="en">Send drawings, samples or specs.</span></p></li>
+        <li><span class="n">STEP 02</span><h3><span class="ko">사양 검토·견적</span><span class="en">Review &amp; quote</span></h3><p><span class="ko">자재와 공정을 검토해 견적을 드립니다.</span><span class="en">We review materials and process, then quote.</span></p></li>
+        <li><span class="n">STEP 03</span><h3><span class="ko">샘플 제작</span><span class="en">Sample</span></h3><p><span class="ko">샘플로 사양을 함께 확정합니다.</span><span class="en">A sample confirms the spec with you.</span></p></li>
+        <li><span class="n">STEP 04</span><h3><span class="ko">생산</span><span class="en">Production</span></h3><p><span class="ko">확정된 사양대로 생산합니다.</span><span class="en">Built exactly to the approved spec.</span></p></li>
+        <li><span class="n">STEP 05</span><h3><span class="ko">검사·출하</span><span class="en">Inspect &amp; ship</span></h3><p><span class="ko">검사를 마친 제품만 출하합니다.</span><span class="en">Only inspected parts are shipped.</span></p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" id="order">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="label">Quote &amp; Order</div><h2><span class="ko">견적·주문 요청</span><span class="en">Request a quote or order</span></h2></div>
+        <p><span class="ko">양식을 보내주시면 담당자가 확인 후 빠르게 연락드립니다.</span><span class="en">Send the form and our team will get back to you quickly.</span></p>
+      </div>
+      <div class="order-grid">
+        <dl class="contact-card">
+          <div><dt>TEL</dt><dd><span>031-471-5089</span><button class="copy" type="button" data-copy="031-471-5089">COPY</button></dd></div>
+          <div><dt>MOBILE</dt><dd><span>010-8721-1016</span><button class="copy" type="button" data-copy="010-8721-1016">COPY</button></dd></div>
+          <div><dt>FAX</dt><dd><span>031-471-5069</span></dd></div>
+          <div><dt>E-MAIL</dt><dd><span>jh2yun@daum.net</span><button class="copy" type="button" data-copy="jh2yun@daum.net">COPY</button></dd></div>
+          <p class="note" style="margin:0"><span class="ko">도면 파일은 이메일로 함께 보내주시면 더 정확한 견적이 가능합니다.</span><span class="en">For an accurate quote, e-mail your drawing files too.</span></p>
+        </dl>
+
+        <form class="order" id="order-form" novalidate>
+          <div class="field full"><label><span class="ko">요청 구분</span><span class="en">Request type</span></label>
+            <div class="chips">
+              <label><input type="radio" name="request_type" id="rt-quote" value="견적 요청 / Quote" checked> <span class="ko">견적 요청</span><span class="en">Quote</span></label>
+              <label><input type="radio" name="request_type" id="rt-order" value="주문 / Order"> <span class="ko">주문</span><span class="en">Order</span></label>
+              <label><input type="radio" name="request_type" id="rt-sample" value="샘플 / Sample"> <span class="ko">샘플</span><span class="en">Sample</span></label>
+              <label><input type="radio" name="request_type" id="rt-other" value="기타 문의 / Other"> <span class="ko">기타 문의</span><span class="en">Other</span></label>
+            </div>
+          </div>
+          <div class="field"><label for="f-company"><span class="ko">회사명</span><span class="en">Company</span><span class="req">*</span></label><input id="f-company" name="company" required autocomplete="organization"></div>
+          <div class="field"><label for="f-name"><span class="ko">담당자</span><span class="en">Contact name</span><span class="req">*</span></label><input id="f-name" name="name" required autocomplete="name"></div>
+          <div class="field"><label for="f-phone"><span class="ko">연락처</span><span class="en">Phone</span><span class="req">*</span></label><input id="f-phone" name="phone" type="tel" required autocomplete="tel" inputmode="tel"></div>
+          <div class="field"><label for="f-email"><span class="ko">이메일</span><span class="en">E-mail</span><span class="req">*</span></label><input id="f-email" name="email" type="email" required autocomplete="email"></div>
+          <div class="field"><label for="f-type"><span class="ko">제품 종류</span><span class="en">Product type</span></label>
+            <select id="f-type" name="product">
+              <option value="와이어 하네스 / Wire harness">와이어 하네스 / Wire harness</option>
+              <option value="케이블 하네스 / Cable harness">케이블 하네스 / Cable harness</option>
+              <option value="몰딩 하네스 / Molded harness">몰딩 하네스 / Molded harness</option>
+              <option value="미정·상담 필요 / Not sure">미정·상담 필요 / Not sure</option>
+            </select></div>
+          <div class="field"><label for="f-qty"><span class="ko">수량</span><span class="en">Quantity</span></label><input id="f-qty" name="quantity" inputmode="numeric"><span class="hint"><span class="ko">예: 500 EA</span><span class="en">e.g. 500 pcs</span></span></div>
+          <div class="field"><label for="f-due"><span class="ko">희망 납기</span><span class="en">Required date</span></label><input id="f-due" name="due_date" type="date"></div>
+          <div class="field"><label for="f-model"><span class="ko">품번·도면번호</span><span class="en">Part / drawing no.</span></label><input id="f-model" name="part_no"></div>
+          <div class="field full"><label for="f-msg"><span class="ko">요청 내용</span><span class="en">Details</span><span class="req">*</span></label><textarea id="f-msg" name="message" required></textarea><span class="hint"><span class="ko">전선 규격(AWG/SQ), 길이, 커넥터 품번, 색상 등을 적어주시면 좋습니다.</span><span class="en">Helpful: wire gauge (AWG/SQ), lengths, connector part numbers, colors.</span></span></div>
+          <label class="agree full"><input type="checkbox" id="f-agree" required> <span><span class="ko">문의 응대를 위한 개인정보(회사명, 담당자, 연락처, 이메일) 수집·이용에 동의합니다.</span><span class="en">I agree to the collection of my contact details to answer this request.</span></span></label>
+          <input type="text" name="_honey" id="f-honey" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+          <div class="form-foot full">
+            <button class="btn primary" type="submit" id="f-submit"><span class="ko">보내기</span><span class="en">Send request</span> <span aria-hidden="true">→</span></button>
+            <span class="alt"><span class="ko">기존 문의 양식:</span><span class="en">Or use our form:</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLSd2wPMhAvTs-rtKu9-KYKfeAMmqCvJKbjb0vYW0Z4LWQ23NGg/viewform" target="_blank" rel="noopener">Google Forms ↗</a></span>
+          </div>
+          <div class="status full" id="f-status" hidden></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="band fields" id="location">
+    <div class="wrap loc-grid">
+      <div>
+        <div class="label">Location</div>
+        <p class="addr">
+          <span class="ko">경기도 안양시 만안구 와룡로 37<small>(구 주소: 경기 안양시 만안구 석수동 753-5)</small></span>
+          <span class="en">37 Waryong-ro, Manan-gu, Anyang-si, Gyeonggi-do, Korea<small>(Former: 753-5 Seoksu-dong)</small></span>
+        </p>
+        <div class="maplinks">
+          <a class="btn ghost" href="https://map.naver.com/p/search/%EC%95%88%EC%96%91%EC%8B%9C%20%EB%A7%8C%EC%95%88%EA%B5%AC%20%EC%99%80%EB%A3%A1%EB%A1%9C%2037" target="_blank" rel="noopener"><span class="ko">네이버 지도</span><span class="en">Naver Map</span> ↗</a>
+          <a class="btn ghost" href="https://map.kakao.com/?q=%EC%95%88%EC%96%91%EC%8B%9C%20%EB%A7%8C%EC%95%88%EA%B5%AC%20%EC%99%80%EB%A3%A1%EB%A1%9C%2037" target="_blank" rel="noopener"><span class="ko">카카오맵</span><span class="en">Kakao Map</span> ↗</a>
+          <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=37+Waryong-ro+Manan-gu+Anyang" target="_blank" rel="noopener">Google Maps ↗</a>
+        </div>
+      </div>
+      <div class="map-art" aria-hidden="true">
+        <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+          <rect width="320" height="200" fill="var(--bg-2)"/>
+          <g stroke="var(--line)" stroke-width="1"><path d="M0 40H320M0 80H320M0 120H320M0 160H320M40 0V200M80 0V200M120 0V200M160 0V200M200 0V200M240 0V200M280 0V200"/></g>
+          <g stroke="var(--line-2)" stroke-width="8" fill="none" stroke-linecap="round">
+            <path d="M-10 140 C80 120 160 150 330 110"/><path d="M120 -10 C130 60 150 120 170 210"/>
+          </g>
+          <path d="M-10 140 C80 120 160 150 330 110" stroke="var(--signal)" stroke-width="1.2" fill="none" stroke-dasharray="4 6"/>
+          <text x="18" y="30" font-family="JetBrains Mono,monospace" font-size="9" fill="var(--muted)" letter-spacing="1.5">37.42°N 126.91°E</text>
+          <text x="214" y="102" font-family="JetBrains Mono,monospace" font-size="9" fill="var(--muted)" letter-spacing="1">WARYONG-RO</text>
+          <circle cx="150" cy="128" r="26" fill="none" stroke="var(--signal)" stroke-width="1" opacity=".5"/>
+          <circle cx="150" cy="128" r="14" fill="var(--signal-dim)" stroke="var(--signal)" stroke-width="1"/>
+          <circle cx="150" cy="128" r="5" fill="var(--node)"/>
+          <text x="182" y="150" font-family="Michroma,sans-serif" font-size="10" fill="var(--ink)" letter-spacing="2">SEJIN TECH</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fb">
+      <svg aria-hidden="true"><use href="#mark"/></svg>
+      <div>
+        <b>SEJIN TECH</b>
+        <p><span class="ko">세진테크 · 대표 윤재훈 · 경기도 안양시 만안구 와룡로 37</span><span class="en">SEJIN TECH · CEO Yun Jae-hoon · 37 Waryong-ro, Manan-gu, Anyang-si</span></p>
+        <p>TEL 031-471-5089 · FAX 031-471-5069 · jh2yun@daum.net</p>
+      </div>
+    </div>
+    <p>© 1997–<span id="yr">2026</span> SEJIN TECH</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // FormSubmit delivers each submission to this inbox. The first submission sends an
+  // activation e-mail to this address; click it once to start receiving orders.
+  var ORDER_EMAIL = "jh2yun@daum.net";
+  var ENDPOINT = "https://formsubmit.co/ajax/" + ORDER_EMAIL;
+  var root = document.documentElement;
+  var yr = document.getElementById("yr"); if (yr) yr.textContent = new Date().getFullYear();
+
+  var T = {
+    ko:{sending:"보내는 중…", ok:"주문·견적 요청이 접수되었습니다. 담당자가 확인 후 연락드리겠습니다.", fail:"지금은 양식을 바로 보낼 수 없습니다. 아래 내용을 복사해 이메일로 보내주시거나 전화 주세요.", copy:"내용 복사", copied:"복사됨", req:"필수 항목입니다.", email:"이메일 형식을 확인해주세요.", agree:"개인정보 수집·이용에 동의해주세요.", menu:"메뉴"},
+    en:{sending:"Sending…", ok:"Your request has been received. We will contact you shortly.", fail:"The form could not be sent right now. Please copy the text below and e-mail it to us, or call.", copy:"Copy text", copied:"Copied", req:"This field is required.", email:"Please check the e-mail address.", agree:"Please agree to the data collection notice.", menu:"Menu"}
+  };
+  function lang(){ return root.lang === "en" ? "en" : "ko"; }
+  function setLang(l){
+    root.lang = l;
+    document.querySelectorAll(".lang button").forEach(function(b){ b.setAttribute("aria-pressed", String(b.dataset.lang === l)); });
+    document.getElementById("burger").setAttribute("aria-label", T[l].menu);
+    try{ localStorage.setItem("sjt-lang", l); }catch(e){}
+  }
+  var saved = null; try{ saved = localStorage.getItem("sjt-lang"); }catch(e){}
+  setLang(saved || ((navigator.language||"ko").toLowerCase().indexOf("ko")===0 ? "ko" : "en"));
+  document.querySelectorAll(".lang button").forEach(function(b){ b.addEventListener("click", function(){ setLang(b.dataset.lang); }); });
+
+  var burger = document.getElementById("burger"), menu = document.getElementById("menu");
+  burger.addEventListener("click", function(){ var o = menu.classList.toggle("open"); burger.setAttribute("aria-expanded", String(o)); });
+  menu.addEventListener("click", function(e){ if (e.target.closest("a")) { menu.classList.remove("open"); burger.setAttribute("aria-expanded","false"); } });
+
+  function fallback(text){ var ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy");}catch(e){} ta.remove(); }
+  function copyText(text, btn){
+    var done = function(){ if(btn){ var o = btn.textContent; btn.textContent = btn.dataset.copy ? "✓" : T[lang()].copied; setTimeout(function(){ btn.textContent = o; }, 1400);} };
+    try{ navigator.clipboard.writeText(text).then(done, function(){ fallback(text); done(); }); }catch(e){ fallback(text); done(); }
+  }
+  document.querySelectorAll("[data-copy]").forEach(function(b){ b.addEventListener("click", function(){ copyText(b.dataset.copy, b); }); });
+
+  /* hero signal wires */
+  var cv = document.getElementById("wires"), ctx = cv.getContext("2d");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var W=0,H=0,dpr=1,wires=[],t0=performance.now();
+  function css(n){ return getComputedStyle(root).getPropertyValue(n).trim(); }
+  function build(){
+    var r = cv.getBoundingClientRect(); dpr = Math.min(window.devicePixelRatio||1,2);
+    W = r.width; H = r.height; cv.width = W*dpr; cv.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    var narrow = W < 760, n = narrow ? 7 : 11; wires = [];
+    var x0 = narrow ? W*0.15 : W*0.42;
+    for (var i=0;i<n;i++){
+      var y1 = H*(0.12 + 0.76*i/(n-1)), y2 = H*(0.5 + (i-(n-1)/2)*0.035);
+      wires.push({y1:y1, y2:y2, x0:x0, sp:0.05+0.04*((i*37)%7)/7, off:(i*0.137)%1, hot:i%3===0});
+    }
+  }
+  function pt(w,u){ // cubic from left fan-out to a bundled trunk on the right
+    var xA=w.x0, xB=W+20, cx1=xA+(xB-xA)*0.45, cx2=xA+(xB-xA)*0.55;
+    var a=1-u; return {x:a*a*a*xA+3*a*a*u*cx1+3*a*u*u*cx2+u*u*u*xB, y:a*a*a*w.y1+3*a*a*u*w.y1+3*a*u*u*w.y2+u*u*u*w.y2};
+  }
+  function draw(now){
+    var sig=css("--signal"), line=css("--line-2"), node=css("--node"), t=(now-t0)/1000;
+    ctx.clearRect(0,0,W,H);
+    wires.forEach(function(w){
+      ctx.beginPath(); for (var k=0;k<=60;k++){ var p=pt(w,k/60); k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y); }
+      ctx.strokeStyle=line; ctx.lineWidth=1.4; ctx.globalAlpha=1; ctx.stroke();
+      var s=pt(w,0); ctx.beginPath(); ctx.arc(s.x,s.y,3.2,0,Math.PI*2); ctx.fillStyle=w.hot?node:line; ctx.fill();
+      var u=reduce? (w.off*0.8+0.1) : ((t*w.sp+w.off)%1);
+      for (var j=0;j<14;j++){ var uu=u-j*0.006; if(uu<0) break; var q=pt(w,uu);
+        ctx.globalAlpha=(1-j/14)*0.95; ctx.beginPath(); ctx.arc(q.x,q.y,j?1.6:2.6,0,Math.PI*2); ctx.fillStyle=sig; ctx.fill(); }
+      ctx.globalAlpha=1;
+    });
+    if(!reduce) raf=requestAnimationFrame(draw);
+  }
+  var raf; build(); draw(performance.now());
+  window.addEventListener("resize", function(){ cancelAnimationFrame(raf); build(); draw(performance.now()); });
+  document.addEventListener("visibilitychange", function(){ if(reduce) return; if(document.hidden) cancelAnimationFrame(raf); else raf=requestAnimationFrame(draw); });
+  try{ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function(){ if(reduce) draw(performance.now()); }); }catch(e){}
+
+  /* order form */
+  var form = document.getElementById("order-form"), status = document.getElementById("f-status"), submit = document.getElementById("f-submit");
+  function clearErr(f){ f.classList.remove("invalid"); var m=f.querySelector(".err-msg"); if(m) m.remove(); }
+  function setErr(input,msg){ var f=input.closest(".field")||input.closest(".agree"); if(!f) return; f.classList.add("invalid"); var m=document.createElement("span"); m.className="err-msg"; m.textContent=msg; f.appendChild(m); }
+  function validate(){
+    var ok=true, first=null;
+    form.querySelectorAll(".field, .agree").forEach(clearErr);
+    form.querySelectorAll("[required]").forEach(function(el){
+      var bad = el.type==="checkbox" ? !el.checked : !el.value.trim();
+      if (bad){ ok=false; setErr(el, el.type==="checkbox"?T[lang()].agree:T[lang()].req); first=first||el; }
+      else if (el.type==="email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim())){ ok=false; setErr(el,T[lang()].email); first=first||el; }
+    });
+    if (first) first.focus(); return ok;
+  }
+  function summary(d){
+    return ["[세진테크 주문·견적 요청]","요청 구분: "+d.request_type,"회사명: "+d.company,"담당자: "+d.name,"연락처: "+d.phone,"이메일: "+d.email,"제품 종류: "+d.product,"수량: "+(d.quantity||"-"),"희망 납기: "+(d.due_date||"-"),"품번·도면번호: "+(d.part_no||"-"),"요청 내용:",d.message].join("\n");
+  }
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    if (!validate()) return;
+    var fd=new FormData(form), d={}; fd.forEach(function(v,k){ d[k]=v; });
+    if (d._honey) return; delete d._honey;
+    var payload=Object.assign({}, d, {_subject:"[세진테크] "+d.request_type+" - "+d.company, _template:"table", _captcha:"false", _replyto:d.email});
+    var label=submit.innerHTML; submit.disabled=true; submit.textContent=T[lang()].sending; status.hidden=true;
+    fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(payload)})
+      .then(function(r){ return r.json().then(function(j){ if(!r.ok||String(j.success)==="false") throw new Error(j.message||"fail"); return j; }); })
+      .then(function(){ status.className="status full ok"; status.textContent=T[lang()].ok; status.hidden=false; form.reset(); })
+      .catch(function(){
+        var text=summary(d); status.className="status full fail"; status.innerHTML="";
+        var p=document.createElement("p"); p.textContent=T[lang()].fail;
+        var pre=document.createElement("pre"); pre.textContent=text;
+        var line=document.createElement("p"); line.style.cssText="display:flex;gap:10px;flex-wrap:wrap;align-items:center";
+        var b=document.createElement("button"); b.type="button"; b.className="copy"; b.textContent=T[lang()].copy; b.addEventListener("click",function(){ copyText(text,b); });
+        var to=document.createElement("span"); to.textContent="→ "+ORDER_EMAIL+" · TEL 031-471-5089";
+        line.appendChild(b); line.appendChild(to); status.appendChild(p); status.appendChild(pre); status.appendChild(line); status.hidden=false;
+      })
+      .finally(function(){ submit.disabled=false; submit.innerHTML=label; status.scrollIntoView({block:"nearest",behavior:"smooth"}); });
+  });
+})();
+</script>
+
+</body>
+</html>
