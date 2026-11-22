@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STILL 시계</title>
+<meta name="description" content="움직이는 부품이 하나도 없는 아날로그 시계 — 사파이어 단일 블록 속 레이저 각인 점들이 빛의 바늘이 되는 미래형 프리미엄 시계 콘셉트">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans+KR:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#07080A;--bg2:#0E1014;--surface:#13161C;--line:#22262E;--line2:#343A45;
+  --ink:#ECEEF2;--muted:#8E95A3;--accent:#C8F04B;--accent2:#4BD3F0;--warn:#F08A4B;
+  --ti1:#9AA1AC;--ti2:#5B616B;--ti3:#2A2E35;--sap:rgba(30,40,55,.55);
+  --f-d:"Michroma","IBM Plex Sans KR",sans-serif;--f-b:"IBM Plex Sans KR",system-ui,sans-serif;--f-m:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+  --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+    --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);line-height:1.7;font-size:15px}
+.wrap{max-width:1120px;margin:0 auto;padding:48px 16px 80px}
+h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+p{margin:0}
+.k{font:500 11px var(--f-m);letter-spacing:.18em;color:var(--accent);text-transform:uppercase}
+.muted{color:var(--muted)}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero h1{font-family:var(--f-d);font-weight:400;font-size:clamp(34px,6vw,58px);letter-spacing:.08em;line-height:1.1;margin:14px 0 18px}
+.hero .lead{font-size:17px;color:var(--muted);max-width:32em}
+.stage{position:relative;aspect-ratio:1/1.18;max-width:520px;width:100%;margin:0 auto}
+.stage svg{width:100%;height:100%;display:block}
+.readout{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:22px}
+.time{font:500 28px var(--f-m);letter-spacing:.06em}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font:500 12px var(--f-m);letter-spacing:.08em;background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:999px;padding:8px 14px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:#0A0C08;border-color:var(--accent)}
+/* sections */
+section{padding-top:72px}
+section > header{margin-bottom:28px;max-width:46em}
+section > header h2{font-size:clamp(22px,3.2vw,30px);margin-top:10px}
+section > header p{color:var(--muted);margin-top:10px}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.g5{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0}
+.card h3{font-size:16px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:14px}
+.rule{display:flex;flex-direction:column;gap:10px}
+.rule .old{font:500 12px var(--f-m);color:var(--muted);text-decoration:line-through;text-decoration-color:var(--warn)}
+.rule .new{font-size:16px;font-weight:600}
+.num{font:400 30px var(--f-d);color:var(--accent);line-height:1}
+.req .tag{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--accent2)}
+.req .big{font:500 22px var(--f-m);margin:8px 0 6px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;overflow:hidden}
+.panel svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+td.n{font-family:var(--f-m);text-align:right;white-space:nowrap}
+tfoot td{font-weight:600;border-bottom:none}
+.tablewrap{overflow-x:auto}
+.flow{counter-reset:s;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.flow li{list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;font-size:14px}
+.flow li::before{counter-increment:s;content:"0" counter(s);display:block;font:500 12px var(--f-m);color:var(--accent);margin-bottom:6px}
+.flow li b{display:block;margin-bottom:4px}
+.flow li span{color:var(--muted)}
+.svgtext{font-family:var(--f-m);font-size:11px;fill:var(--muted)}
+.svglabel{font-family:var(--f-b);font-size:12px;fill:var(--ink)}
+footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.risk td:first-child{font-weight:600;white-space:nowrap}
+</style>
+<style>
+.nav{display:flex;gap:16px;flex-wrap:wrap;font:500 12px var(--f-m);letter-spacing:.08em;margin-bottom:40px}
+.nav a{color:var(--muted);text-decoration:none;border-bottom:1px solid transparent}
+.nav a[aria-current]{color:var(--ink);border-color:var(--accent)}
+td.win{color:var(--accent);font-weight:600}
+.verdict{margin-top:14px;font-size:15px}
+.verdict b{color:var(--accent)}
+#light{transition:opacity .6s ease}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="nav"><a href="../zero-axis/">01 ZERO-AXIS</a><a href="../linea/">02 LINEA</a><a href="./" aria-current="page">03 STILL</a></nav>
+
+<div class="hero">
+  <div>
+    <div class="k">Concept 03 · Solid-State Analog</div>
+    <h1>STILL</h1>
+    <p class="lead">움직이는 부품이 <b>하나도 없는</b> 아날로그 시계. 사파이어 한 덩어리 속에 레이저로 새긴 수만 개의 미세한 점이 있고, 가장자리의 LED가 한 방향으로 빛을 쏘면 그 길을 따라 점들이 깨어나 <b>빛의 바늘</b>이 됩니다. 평소에는 얼음 조각처럼 조용하다가, 손목을 들면 시간을 답합니다.</p>
+    <div class="readout">
+      <div class="time" id="readout">--:--:--</div>
+      <div class="btns">
+        <button id="bOn" aria-pressed="true">항상 표시</button>
+        <button id="bGlance" aria-pressed="false">글랜스 모드</button>
+        <button id="bFast" aria-pressed="false">빨리감기 ×600</button>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13px;margin-top:10px" id="hint">긴 청록 빛 = 분 · 짧은 흰 빛 = 시 · 테두리의 희미한 점 = 초. 분 바늘은 매분 정각에 한 칸 점프(점핑 미닛)하고, 시 바늘은 12분마다 6°씩 이동합니다.</p>
+  </div>
+
+  <div class="stage">
+    <svg id="watch" viewBox="-240 -284 480 568" role="img" aria-label="STILL 상면도">
+      <defs>
+        <radialGradient id="puck" cx="42%" cy="36%" r="75%">
+          <stop offset="0" stop-color="#1C2633"/><stop offset=".6" stop-color="#0C1119"/><stop offset="1" stop-color="#05070A"/>
+        </radialGradient>
+        <linearGradient id="band" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#D0D5DC"/><stop offset=".5" stop-color="#5A6069"/><stop offset="1" stop-color="#B3B9C2"/>
+        </linearGradient>
+        <linearGradient id="strap" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#15171B"/><stop offset=".5" stop-color="#2A2D33"/><stop offset="1" stop-color="#15171B"/>
+        </linearGradient>
+        <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3.2" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <radialGradient id="hub" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#3A3F48"/><stop offset="1" stop-color="#050608"/></radialGradient>
+      </defs>
+      <path d="M-86 -190 L-80 -284 L80 -284 L86 -190 Z" fill="url(#strap)"/>
+      <path d="M-86 190 L-80 284 L80 284 L86 190 Z" fill="url(#strap)"/>
+      <!-- titanium band (the whole 'case') -->
+      <circle r="214" fill="url(#band)"/>
+      <circle r="205" fill="#0B0D11"/>
+      <!-- LED ring (visible through sapphire edge) -->
+      <g id="leds"></g>
+      <!-- sapphire monolith -->
+      <circle r="198" fill="url(#puck)"/>
+      <!-- unlit engraved dot field (shimmer) -->
+      <g id="field" fill="#9FB4C8"></g>
+      <!-- engraved denser hour markers, always faintly visible -->
+      <g id="markers" fill="#C9D6E2"></g>
+      <!-- light hands -->
+      <g id="light" filter="url(#glow)">
+        <g id="minHand" fill="#7FF0FF"></g>
+        <g id="hrHand" fill="#FFF4E0"></g>
+      </g>
+      <!-- black zirconia absorber core -->
+      <circle r="13" fill="url(#hub)" stroke="#2C323C"/>
+      <circle r="198" fill="url(#glare)"/>
+      <text x="0" y="211" text-anchor="middle" font-family="Michroma" font-size="7" letter-spacing="3" fill="#2A2E35">STILL</text>
+    </svg>
+  </div>
+</div>
+
+<section>
+  <header>
+    <div class="k">01 · 파괴한 시계공장 원칙</div>
+    <h2>ZERO-AXIS는 중심을, LINEA는 원을, STILL은 ‘움직임’을 버렸다</h2>
+    <p>아날로그 시계의 정의는 ‘무언가가 돌아간다’였습니다. STILL은 아날로그의 읽는 방식은 그대로 두고, 움직이는 것을 전부 빛으로 바꿨습니다.</p>
+  </header>
+  <div class="grid g3">
+    <div class="card rule"><div class="num">01</div><div class="old">아날로그 시계는 바늘이 움직인다</div><div class="new">움직이는 부품 0개</div><p>모터·기어·바늘·축이 없습니다. 마모되는 부품이 없으니 오버홀도 없고, 충격에 바늘이 빠질 일도 없습니다.</p></div>
+    <div class="card rule"><div class="num">02</div><div class="old">바늘은 물체다</div><div class="new">바늘은 빛이 지나간 자리다</div><p>사파이어 내부 전체에 지름 10 μm 수준의 미세 각인점이 흩어져 있고, 테두리 LED가 쏜 좁은 빛줄기가 지나가는 선 위의 점들만 산란해 빛납니다.</p></div>
+    <div class="card rule"><div class="num">03</div><div class="old">다이얼 위에 유리를 덮는다</div><div class="new">유리가 곧 시계다</div><p>다이얼·크리스털·바늘이 한 덩어리의 사파이어. 사이에 공기층이 없으니 김서림, 먼지, 반사가 생길 틈이 없습니다.</p></div>
+    <div class="card rule"><div class="num">04</div><div class="old">시계는 항상 시간을 보여준다</div><div class="new">물을 때만 답한다</div><p>평소엔 투명한 얼음 조각. 손목을 들거나 두드리면 3초간 빛의 바늘이 떠오릅니다. ‘시간을 확인하는 행위’ 자체가 의식이 됩니다.</p></div>
+    <div class="card rule"><div class="num">05</div><div class="old">바늘 정렬은 사람이 맞춘다</div><div class="new">표시 오차 0</div><p>바늘 위치는 어느 LED를 켜느냐로 결정되는 디지털 주소. 바늘이 밀리거나 어긋나는 일이 물리적으로 불가능합니다.</p></div>
+    <div class="card rule"><div class="num">06</div><div class="old">얼굴은 공장에서 정해진다</div><div class="new">바늘 모양은 펌웨어다</div><p>인접 LED를 몇 개 함께 켜느냐로 바늘 굵기·잔광·스윕 연출이 바뀝니다. 같은 하드웨어로 여러 ‘에디션’을 판매할 수 있습니다.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">02 · 다섯 가지 조건 검증</div>
+    <h2>가장 단순한 구조로, 가장 낯선 시계를</h2>
+  </header>
+  <div class="grid g5">
+    <div class="card req"><div class="tag">① 제조 가능성</div><div class="big">레이저 + SMT</div><p>사파이어 내부 펨토초 레이저 각인(유리 크리스털 기념품·광도파로 산업에서 양산 중), 플렉스 기판 위 마이크로 LED SMT. 기계 가공은 티타늄 밴드 하나.</p></div>
+    <div class="card req"><div class="tag">② 정확도</div><div class="big">±1 s/년 · 표시 0</div><p>온도보상 AT컷 수정 + BLE/표준전파 동기. 기계적 표시 오차가 원천적으로 없음 — 시간 기준의 정확도가 그대로 화면의 정확도.</p></div>
+    <div class="card req"><div class="tag">③ 파격</div><div class="big">가동부 0</div><p>바늘 없는 아날로그. 꺼져 있으면 시계인지조차 모르는 투명한 블록. 빛이 사파이어 ‘속’에서 떠오르는 경험.</p></div>
+    <div class="card req"><div class="tag">④ 프리미엄</div><div class="big">사파이어 모놀리스</div><p>Ø40 × 7 mm 단결정 사파이어 블록, Ti G5 밴드, 블랙 지르코니아 코어와 백. 보석처럼 연마된 하나의 결정.</p></div>
+    <div class="card req"><div class="tag">⑤ 대량 양산</div><div class="big">연 15만 개</div><p>레이저 각인 40초/개 자동화, LED 링은 롤투롤 플렉스 SMT, 조립 공정 5단계. 조정 공정 0.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">03 · 빛의 바늘 원리 · 단면</div>
+    <h2>두 층의 빛길, 두 개의 바늘</h2>
+    <p>사파이어 블록은 두 장을 저굴절 광학 접착층으로 붙인 구조입니다. 각 층은 독립된 빛길(도파로)이 되어, 위층 LED 60개는 시 바늘만, 아래층 LED 60개는 분 바늘만 그립니다. 시 바늘 층은 중심 반경 12 mm 안쪽에만 각인점이 있어 짧은 바늘이 됩니다.</p>
+  </header>
+  <div class="panel">
+    <svg viewBox="0 0 900 380" role="img" aria-label="STILL 단면도 및 빛의 바늘 원리">
+      <defs>
+        <linearGradient id="beamH" x1="0" x2="1"><stop offset="0" stop-color="#FFF4E0" stop-opacity=".9"/><stop offset="1" stop-color="#FFF4E0" stop-opacity=".15"/></linearGradient>
+        <linearGradient id="beamM" x1="0" x2="1"><stop offset="0" stop-color="#7FF0FF" stop-opacity=".9"/><stop offset="1" stop-color="#7FF0FF" stop-opacity=".2"/></linearGradient>
+        <pattern id="hatch3" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#7A808A" stroke-width="2"/></pattern>
+      </defs>
+      <!-- scale 1 mm = 18 px; Ø42 => 756 px; start x=72 -->
+      <g transform="translate(72,50)">
+        <!-- Ti band -->
+        <rect x="0" y="0" width="18" height="190" rx="4" fill="url(#hatch3)" stroke="#9AA1AC"/>
+        <rect x="738" y="0" width="18" height="190" rx="4" fill="url(#hatch3)" stroke="#9AA1AC"/>
+        <!-- LED flex ring + microlens -->
+        <rect x="18" y="14" width="12" height="100" fill="#F08A4B" fill-opacity=".85"/>
+        <rect x="726" y="14" width="12" height="100" fill="#F08A4B" fill-opacity=".85"/>
+        <circle cx="34" cy="38" r="5" fill="#FFF4E0"/><circle cx="34" cy="88" r="5" fill="#7FF0FF"/>
+        <circle cx="722" cy="38" r="5" fill="#FFF4E0" opacity=".3"/><circle cx="722" cy="88" r="5" fill="#7FF0FF" opacity=".3"/>
+        <!-- sapphire upper layer (hour) -->
+        <rect x="30" y="10" width="696" height="56" fill="#4BD3F0" fill-opacity=".14" stroke="#4BD3F0" stroke-opacity=".6"/>
+        <!-- bond -->
+        <rect x="30" y="66" width="696" height="4" fill="#4BD3F0" fill-opacity=".5"/>
+        <!-- sapphire lower layer (minute) -->
+        <rect x="30" y="70" width="696" height="56" fill="#4BD3F0" fill-opacity=".14" stroke="#4BD3F0" stroke-opacity=".6"/>
+        <!-- dot fields -->
+        <g id="xsDots"></g>
+        <!-- beams from left rim -->
+        <rect x="40" y="36" width="122" height="4" fill="#FFF4E0" fill-opacity=".18"/>
+        <rect x="162" y="35" width="193" height="6" fill="#FFF4E0" fill-opacity=".9"/>
+        <text x="100" y="30" text-anchor="middle" class="svgtext">점 없음 = 보이지 않음</text>
+        <text x="258" y="30" text-anchor="middle" class="svgtext" style="fill:#FFF4E0">각인점 = 시 바늘</text>
+        <rect x="40" y="85" width="315" height="6" fill="#7FF0FF" fill-opacity=".85"/>
+        <!-- absorber core -->
+        <rect x="355" y="10" width="46" height="116" fill="#0A0B0D" stroke="#5B616B"/>
+        <!-- black backing -->
+        <rect x="30" y="126" width="696" height="8" fill="#16181C" stroke="#3A3F48"/>
+        <!-- electronics module -->
+        <rect x="40" y="140" width="676" height="10" fill="#2BB673"/>
+        <rect x="80" y="154" width="596" height="22" rx="5" fill="#8E95A3" fill-opacity=".55" stroke="#8E95A3"/>
+        <!-- zirconia back -->
+        <path d="M18 182 L738 182 L738 190 Q378 222 18 190 Z" fill="#1E2127" stroke="#5B616B"/>
+        <path d="M240 196 Q378 210 516 196" stroke="#E0457B" stroke-width="3" fill="none"/>
+      </g>
+      <g font-family="IBM Plex Sans KR, sans-serif" font-size="12.5">
+        <text x="72" y="310" fill="#FFF4E0">━ 위층 빛길: 시 바늘 (각인점은 r &lt; 12 mm 영역에만)</text>
+        <text x="72" y="332" fill="#7FF0FF">━ 아래층 빛길: 분 바늘 (각인점 전 영역)</text>
+        <text x="72" y="354" fill="#F08A4B">■ LED 플렉스 링 60 + 60개 · 마이크로렌즈로 0.4 mm 빔 성형</text>
+        <text x="530" y="310" fill="var(--muted)">■ 블랙 지르코니아 코어 — 빛 흡수, 반대편 누광 차단</text>
+        <text x="530" y="332" fill="#2BB673">■ PCB · <tspan fill="#8E95A3">Li-ion 셀</tspan></text>
+        <text x="530" y="354" fill="#E0457B">━ 무선 충전 코일 (지르코니아 백 내부)</text>
+      </g>
+      <text x="450" y="30" text-anchor="middle" class="svgtext">Ø42 · 두께 10.4 mm · 사파이어 7.0 mm (3.1 + 0.2 + 3.1 + 흑색층) · 왼쪽 LED가 켜진 순간</text>
+    </svg>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">04 · 구동과 정확도</div>
+    <h2>바늘을 ‘움직이는’ 대신 ‘고른다’</h2>
+  </header>
+  <div class="grid g3">
+    <div class="card"><h3>점핑 미닛</h3><p>분 바늘은 60개 LED 중 하나를 고르는 것 — 매분 00초에 6°씩 정확히 점프합니다. 기계식에서는 고급 컴플리케이션인 점핑 미닛이 여기선 기본값.</p></div>
+    <div class="card"><h3>시 바늘 60단계</h3><p>시 바늘도 60개 LED를 써서 12분마다 6°씩 이동. 3개 LED를 함께 켜(중앙 100%, 양옆 25%) 분 바늘보다 굵고 부드러운 빛으로 구분합니다.</p></div>
+    <div class="card"><h3>초 표시</h3><p>빔을 쏘지 않고 테두리 LED 자체를 희미하게 켜 초의 위치를 점 하나로 표시. 글랜스 3초 동안 점이 테두리를 따라 흐릅니다.</p></div>
+    <div class="card"><h3>시간 기준</h3><p>8.4 MHz AT컷 수정 + 디지털 온도보상으로 단독 연 ±1초. 하루 1회 BLE·표준전파 동기 시 오차 &lt; 0.05초. 표시계의 기계 오차는 0.</p></div>
+    <div class="card"><h3>깨우기</h3><p>가속도 센서가 손목을 들어 올리는 동작을 감지하면 0.15초 만에 점등, 3초 후 소등. 사파이어 표면을 두 번 두드려도 깨어납니다(가속도 탭 감지).</p></div>
+    <div class="card"><h3>밝기 · 전원</h3><p>조도 센서로 실내 저휘도 ~ 직사광선 고휘도 자동 조절. 글랜스 모드 하루 100회 기준 1회 충전 약 2개월(설계 목표). 무선 충전, 커넥터 없음.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">05 · 양산 공정</div>
+    <h2>시계 조립이 아니라 ‘광학 부품 조립’</h2>
+  </header>
+  <ol class="flow" style="padding:0;margin:0">
+    <li><b>사파이어 블랭크</b><span>Ø40 × 3.1 mm 디스크 2장, 양면 연마 · 외주 광학 연마</span></li>
+    <li><b>내부 각인</b><span>펨토초 레이저로 층별 점 필드 + 12개 인덱스 각인, 40초/장, 비전 검사</span></li>
+    <li><b>접합</b><span>저굴절 광학 접착(굴절률 1.41)으로 2장 접합, 중앙 Ø6 홀에 블랙 지르코니아 코어 압입</span></li>
+    <li><b>LED 링</b><span>120 LED 플렉스를 롤투롤 SMT, 마이크로렌즈 링 정렬 접합</span></li>
+    <li><b>밴드 결합</b><span>Ti 밴드에 LED 링 + 사파이어 삽입, 상단 레이저 브레이징 밀봉</span></li>
+    <li><b>백 모듈</b><span>PCB · 셀 · 코일 일체 지르코니아 백을 하단에서 결합</span></li>
+    <li><b>자동 검사</b><span>카메라로 120개 빔 각도 전수 측정 → 보정표 펌웨어 기록, 10 bar 리크 테스트</span></li>
+  </ol>
+</section>
+
+<section>
+  <header>
+    <div class="k">06 · 원가 구조 (연 15만 개 기준 추정)</div>
+    <h2>원가 약 7.6만 원, 판매가 149만 원대</h2>
+    <p>가장 비싼 부품은 사파이어 블록 하나. 나머지는 전부 전자 부품 시세. 공개 시세 기반 개략 추정이며 공급사 RFQ로 확정해야 합니다.</p>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>모듈</th><th>사양</th><th style="text-align:right">개당 (원)</th></tr></thead>
+      <tbody>
+        <tr><td>사파이어 모놀리스</td><td>Ø40 × 3.1 mm ×2, 양면·외주 광학 연마, 접합</td><td class="n">22,000</td></tr>
+        <tr><td>내부 레이저 각인</td><td>펨토초, 2층 점 필드 + 인덱스</td><td class="n">3,000</td></tr>
+        <tr><td>LED 플렉스 링</td><td>마이크로 LED 120개, 마이크로렌즈 링, 드라이버 IC</td><td class="n">6,500</td></tr>
+        <tr><td>티타늄 밴드</td><td>Ti G5 링 + 러그, CNC</td><td class="n">11,000</td></tr>
+        <tr><td>지르코니아 코어 · 백</td><td>블랙 지르코니아 CIM, 무선충전 코일 일체</td><td class="n">4,500</td></tr>
+        <tr><td>전자</td><td>BLE MCU, AT컷 수정, 온도·가속도·조도 센서, PCB</td><td class="n">7,500</td></tr>
+        <tr><td>전원</td><td>Li-ion 셀</td><td class="n">2,500</td></tr>
+        <tr><td>스트랩</td><td>FKM 러버, 티타늄 버클</td><td class="n">8,000</td></tr>
+        <tr><td>조립 · 검사 · 수율손실</td><td>자동 라인, 수율 95% 가정</td><td class="n">7,000</td></tr>
+        <tr><td>패키지</td><td>-</td><td class="n">4,000</td></tr>
+      </tbody>
+      <tfoot><tr><td>합계</td><td>목표 판매가 1,490,000원</td><td class="n">76,000</td></tr></tfoot>
+    </table>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">07 · 기술 리스크와 대응</div>
+    <h2>빛으로 바꾼 대가</h2>
+  </header>
+  <div class="panel tablewrap">
+    <table class="risk">
+      <thead><tr><th>리스크</th><th>내용</th><th>대응</th></tr></thead>
+      <tbody>
+        <tr><td>직사광선 가독성</td><td>한낮 야외에서 빛의 바늘이 묻힐 수 있음 — 가장 큰 리스크</td><td>고휘도 모드(순간 전류 증가) + 블랙 백킹으로 대비 확보, 12개 인덱스는 각인 밀도를 높여 무전원에서도 보이게. 시제품 1순위 검증 항목.</td></tr>
+        <tr><td>빔 퍼짐 · 누광</td><td>빛이 넓게 퍼지면 바늘이 두꺼워지고 옆 층으로 샘</td><td>마이크로렌즈 링으로 0.4 mm 빔 성형, 층 사이 저굴절 접착층으로 전반사 가둠, 코어에서 흡수.</td></tr>
+        <tr><td>꺼진 상태의 흐림</td><td>점 밀도가 높으면 사파이어가 뿌옇게 보임</td><td>점 크기·밀도 최적화(체적 대비 1% 미만), 꺼진 상태 투명도를 품질 기준으로 관리.</td></tr>
+        <tr><td>전력</td><td>LED는 바늘 모터보다 순간 전력이 큼</td><td>글랜스 방식(3초 점등)이 기본, ‘항상 표시’는 저휘도 선택 기능. 설계 목표 2개월, 실측 필요.</td></tr>
+        <tr><td>‘아날로그’ 정체성</td><td>LED 시계를 스마트워치로 오해할 위험</td><td>화면·픽셀·알림 없음. 오직 바늘 두 개와 초 점 하나 — 기능을 의도적으로 제한해 시계로 포지셔닝.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">08 · 세 콘셉트 비교</div>
+    <h2>ZERO-AXIS · LINEA · STILL</h2>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>항목</th><th>01 ZERO-AXIS</th><th>02 LINEA</th><th>03 STILL</th></tr></thead>
+      <tbody>
+        <tr><td>버린 원칙</td><td>중심축 · 막힌 다이얼</td><td>원형 시간 · 회전</td><td>움직임 자체 · 상시 표시</td></tr>
+        <tr><td>표시</td><td>허브리스 회전 링</td><td>리니어 셔틀 + 플라이백</td><td>사파이어 속 빛의 바늘</td></tr>
+        <tr><td>가동 부품</td><td>링 2 · 모터 2</td><td>셔틀 2 · 모터 2</td><td class="win">0</td></tr>
+        <tr><td>첫인상</td><td class="win">손목이 보임</td><td>직선 · 플라이백</td><td class="win">빛이 떠오름</td></tr>
+        <tr><td>제조 난이도</td><td>높음</td><td class="win">중간</td><td>중간 (광학 정렬)</td></tr>
+        <tr><td>내구성</td><td>보통</td><td>보통 (리드스크루)</td><td class="win">높음 (마모 없음)</td></tr>
+        <tr><td>항상 보이는가</td><td class="win">예</td><td class="win">예</td><td>아니오 (글랜스)</td></tr>
+        <tr><td>배터리 (목표)</td><td class="win">8개월</td><td>3개월</td><td>2개월</td></tr>
+        <tr><td>원가 / 판매가</td><td>92,000 / 179만</td><td class="win">70,500 / 129만</td><td>76,000 / 149만</td></tr>
+        <tr><td>최대 리스크</td><td>관통부 방수</td><td>전력 · 스크루 내구</td><td>직사광선 가독성</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="verdict">세 콘셉트는 <b>시간 기준 회로(MCU · 온도보상 수정 · BLE/표준전파 동기)를 공유</b>하는 하나의 플랫폼입니다. 표시계만 바꿔 <b>LINEA(엔트리) → STILL(디자인 아이콘) → ZERO-AXIS(플래그십)</b> 3단 라인업으로 운영하면 전자 플랫폼 개발비를 한 번만 쓰고 세 개의 제품을 만들 수 있습니다.</p>
+</section>
+
+<footer>STILL · 콘셉트 디자인 문서 · 수치(원가·정확도·전원)는 공개 부품 사양 기반 설계 목표치이며 시제품 검증이 필요합니다.</footer>
+</div>
+
+<script>
+(function(){
+  const NS="http://www.w3.org/2000/svg";
+  function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+  let seed=7; const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+  // unlit shimmer field
+  const field=document.getElementById("field");
+  for(let i=0;i<700;i++){const r=16+182*Math.sqrt(rnd()),a=rnd()*2*Math.PI;
+    field.appendChild(el("circle",{cx:(r*Math.sin(a)).toFixed(1),cy:(-r*Math.cos(a)).toFixed(1),r:.7,opacity:(.05+rnd()*.08).toFixed(2)}));}
+  // engraved hour markers
+  const mk=document.getElementById("markers");
+  for(let h=0;h<12;h++){const a=h*Math.PI/6, n=h%3===0?14:7, r0=h%3===0?160:168;
+    for(let j=0;j<n;j++){const r=r0+j*2.2+rnd()*.8, w=(rnd()-.5)*(h%3===0?4:2);
+      mk.appendChild(el("circle",{cx:(r*Math.sin(a)+w*Math.cos(a)).toFixed(1),cy:(-r*Math.cos(a)+w*Math.sin(a)).toFixed(1),r:.9,opacity:.55}));}}
+  // LED ring
+  const leds=document.getElementById("leds"), ledEls=[];
+  for(let i=0;i<60;i++){const a=i*Math.PI/30;
+    const e=el("rect",{x:-1.6,y:-203,width:3.2,height:3.2,rx:.6,fill:"#2A2E35",transform:"rotate("+i*6+")"});leds.appendChild(e);ledEls.push(e);}
+  // pre-generate hand dot sets (stable jitter)
+  function handDots(r0,r1,spread,count){const pts=[];for(let i=0;i<count;i++){pts.push({r:r0+(r1-r0)*rnd(),w:(rnd()-.5)*spread,s:.8+rnd()*1.1,o:.45+rnd()*.55});}return pts;}
+  const minPts=handDots(16,192,3.0,240), hrPts=handDots(16,116,6.5,190);
+  function draw(g,pts,deg,taper){g.innerHTML="";const a=deg*Math.PI/180,s=Math.sin(a),c=Math.cos(a);
+    for(const p of pts){const w=p.w*(taper?(0.6+0.4*(1-p.r/200)):1);
+      g.appendChild(el("circle",{cx:(p.r*s+w*c).toFixed(1),cy:(-p.r*c+w*s).toFixed(1),r:p.s.toFixed(2),opacity:p.o.toFixed(2)}));}}
+  const minG=document.getElementById("minHand"), hrG=document.getElementById("hrHand"), light=document.getElementById("light");
+  const ro=document.getElementById("readout");
+  const bOn=document.getElementById("bOn"), bG=document.getElementById("bGlance"), bF=document.getElementById("bFast"), watch=document.getElementById("watch");
+  let glance=false, fast=false, base=0, simBase=0, last=Date.now(), prev={m:-1,h:-1,s:-1}, offAt=0;
+  function setPressed(){bOn.setAttribute("aria-pressed",!glance);bG.setAttribute("aria-pressed",glance);bF.setAttribute("aria-pressed",fast);}
+  bOn.onclick=()=>{glance=false;setPressed();};
+  bG.onclick=()=>{glance=true;offAt=performance.now()+3000;setPressed();};
+  bF.onclick=()=>{fast=!fast;if(fast){base=Date.now();simBase=last;}setPressed();};
+  watch.style.cursor="pointer";
+  watch.addEventListener("click",()=>{if(glance)offAt=performance.now()+3000;});
+  function tick(){
+    const real=Date.now();
+    last=fast?simBase+(real-base)*600:real;
+    const d=new Date(last);
+    const m=d.getMinutes(), h=((d.getHours()%12)*5+Math.floor(m/12))%60, s=d.getSeconds();
+    if(m!==prev.m){draw(minG,minPts,m*6,false);}
+    if(h!==prev.h){draw(hrG,hrPts,h*6,true);}
+    const lit = !glance || performance.now()<offAt;
+    light.style.opacity = lit?1:0;
+    if(m!==prev.m||h!==prev.h||s!==prev.s||lit!==prev.lit){
+      ledEls.forEach((e,i)=>{let f="#2A2E35";
+        if(lit){ if(i===m) f="#7FF0FF"; else if(i===h||i===(h+1)%60||i===(h+59)%60) f="#FFF4E0"; else if(i===s) f="#5B7A86"; }
+        e.setAttribute("fill",f);});
+    }
+    prev={m,h,s,lit};
+    const p=n=>String(n).padStart(2,"0");
+    ro.textContent=p(d.getHours())+":"+p(m)+":"+p(s);
+    requestAnimationFrame(tick);
+  }
+  // section dot fields in cross-section
+  const xs=document.getElementById("xsDots");
+  for(let i=0;i<160;i++){const x=40+rnd()*676; if(x>350&&x<406)continue;
+    const inner=Math.abs(x-378)<216; // hour field only r<12mm (=216px)
+    if(inner) xs.appendChild(el("circle",{cx:x.toFixed(1),cy:(16+rnd()*44).toFixed(1),r:1.1,fill:"#9FB4C8",opacity:.6}));
+    xs.appendChild(el("circle",{cx:x.toFixed(1),cy:(76+rnd()*44).toFixed(1),r:1.1,fill:"#9FB4C8",opacity:.45}));}
+  tick();
+})();
+</script>
+</body>
+</html>
