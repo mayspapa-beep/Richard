@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZERO-AXIS 시계</title>
+<meta name="description" content="중심축·크라운·다이얼을 없앤 관통형 링 구동 시계 — 양산 가능한 미래형 프리미엄 시계 콘셉트">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans+KR:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#07080A;--bg2:#0E1014;--surface:#13161C;--line:#22262E;--line2:#343A45;
+  --ink:#ECEEF2;--muted:#8E95A3;--accent:#C8F04B;--accent2:#4BD3F0;--warn:#F08A4B;
+  --ti1:#9AA1AC;--ti2:#5B616B;--ti3:#2A2E35;--sap:rgba(30,40,55,.55);
+  --f-d:"Michroma","IBM Plex Sans KR",sans-serif;--f-b:"IBM Plex Sans KR",system-ui,sans-serif;--f-m:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+  --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+    --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);line-height:1.7;font-size:15px}
+.wrap{max-width:1120px;margin:0 auto;padding:48px 16px 80px}
+h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+p{margin:0}
+.k{font:500 11px var(--f-m);letter-spacing:.18em;color:var(--accent);text-transform:uppercase}
+.muted{color:var(--muted)}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero h1{font-family:var(--f-d);font-weight:400;font-size:clamp(34px,6vw,58px);letter-spacing:.08em;line-height:1.1;margin:14px 0 18px}
+.hero .lead{font-size:17px;color:var(--muted);max-width:32em}
+.stage{position:relative;aspect-ratio:1/1.18;max-width:520px;width:100%;margin:0 auto}
+.stage svg{width:100%;height:100%;display:block}
+.readout{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:22px}
+.time{font:500 28px var(--f-m);letter-spacing:.06em}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font:500 12px var(--f-m);letter-spacing:.08em;background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:999px;padding:8px 14px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:#0A0C08;border-color:var(--accent)}
+/* sections */
+section{padding-top:72px}
+section > header{margin-bottom:28px;max-width:46em}
+section > header h2{font-size:clamp(22px,3.2vw,30px);margin-top:10px}
+section > header p{color:var(--muted);margin-top:10px}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.g5{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0}
+.card h3{font-size:16px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:14px}
+.rule{display:flex;flex-direction:column;gap:10px}
+.rule .old{font:500 12px var(--f-m);color:var(--muted);text-decoration:line-through;text-decoration-color:var(--warn)}
+.rule .new{font-size:16px;font-weight:600}
+.num{font:400 30px var(--f-d);color:var(--accent);line-height:1}
+.req .tag{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--accent2)}
+.req .big{font:500 22px var(--f-m);margin:8px 0 6px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;overflow:hidden}
+.panel svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+td.n{font-family:var(--f-m);text-align:right;white-space:nowrap}
+tfoot td{font-weight:600;border-bottom:none}
+.tablewrap{overflow-x:auto}
+.flow{counter-reset:s;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.flow li{list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;font-size:14px}
+.flow li::before{counter-increment:s;content:"0" counter(s);display:block;font:500 12px var(--f-m);color:var(--accent);margin-bottom:6px}
+.flow li b{display:block;margin-bottom:4px}
+.flow li span{color:var(--muted)}
+.svgtext{font-family:var(--f-m);font-size:11px;fill:var(--muted)}
+.svglabel{font-family:var(--f-b);font-size:12px;fill:var(--ink)}
+footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.risk td:first-child{font-weight:600;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="k">Concept 01 · Through-Core Chronometer</div>
+    <h1>ZERO&#8209;AXIS</h1>
+    <p class="lead">시계의 심장인 <b>중심축</b>을 지웠습니다. 바늘도, 크라운도, 막힌 다이얼도 없습니다. 시간은 가장자리에서 회전하는 두 개의 사파이어 링이 가리키고, 시계의 한가운데는 <b>뚫려 있어 손목이 보입니다.</b></p>
+    <div class="readout">
+      <div class="time" id="readout">--:--:--</div>
+      <div class="btns">
+        <button id="bLive" aria-pressed="true">실시간</button>
+        <button id="bFast" aria-pressed="false">빨리감기 ×600</button>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13px;margin-top:10px">바깥 링의 긴 바 = 분 · 안쪽 링의 굵은 바 = 시. 분 링은 10초마다 1°, 시 링은 2분마다 1° 스텝 구동(실제 스텝 모터 동작 그대로 재현).</p>
+  </div>
+
+  <div class="stage">
+    <svg id="watch" viewBox="-240 -284 480 568" role="img" aria-label="ZERO-AXIS 상면도">
+      <defs>
+        <radialGradient id="skin" cx="40%" cy="35%" r="80%">
+          <stop offset="0" stop-color="#E2B394"/><stop offset=".7" stop-color="#C08C6C"/><stop offset="1" stop-color="#8E604A"/>
+        </radialGradient>
+        <linearGradient id="ti" x1="0" y1="-1" x2="0" y2="1" gradientUnits="objectBoundingBox">
+          <stop offset="0" stop-color="#C9CED6"/><stop offset=".45" stop-color="#6E747E"/><stop offset=".55" stop-color="#4A4F57"/><stop offset="1" stop-color="#A9AFB8"/>
+        </linearGradient>
+        <linearGradient id="tiIn" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#D5DAE1"/><stop offset=".5" stop-color="#555A62"/><stop offset="1" stop-color="#2C3036"/>
+        </linearGradient>
+        <radialGradient id="ringDark" cx="50%" cy="50%" r="50%">
+          <stop offset=".6" stop-color="#0D1016"/><stop offset="1" stop-color="#1A1F28"/>
+        </radialGradient>
+        <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="strap" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#15171B"/><stop offset=".5" stop-color="#2A2D33"/><stop offset="1" stop-color="#15171B"/>
+        </linearGradient>
+        <mask id="donut"><rect x="-240" y="-240" width="480" height="480" fill="#fff"/><circle r="80" fill="#000"/></mask>
+      </defs>
+
+      <!-- strap stubs -->
+      <path d="M-92 -196 L-84 -284 L84 -284 L92 -196 Z" fill="url(#strap)"/>
+      <path d="M-92 196 L-84 284 L84 284 L92 196 Z" fill="url(#strap)"/>
+
+      <!-- wrist visible through the core -->
+      <circle r="82" fill="url(#skin)"/>
+      <g opacity=".18" stroke="#6B4632" stroke-width="1" fill="none">
+        <path d="M-80 -20 C-30 -30 20 -10 80 -26"/><path d="M-80 18 C-20 6 30 30 80 14"/><path d="M-70 52 C-20 44 30 62 70 48"/>
+      </g>
+
+      <g mask="url(#donut)">
+        <!-- lugs + monocoque -->
+        <path d="M-110 -150 Q-118 -200 -96 -212 L-64 -212 Q-58 -190 -40 -186 Z" fill="url(#ti)"/>
+        <path d="M110 -150 Q118 -200 96 -212 L64 -212 Q58 -190 40 -186 Z" fill="url(#ti)"/>
+        <path d="M-110 150 Q-118 200 -96 212 L-64 212 Q-58 190 -40 186 Z" fill="url(#ti)"/>
+        <path d="M110 150 Q118 200 96 212 L64 212 Q58 190 40 186 Z" fill="url(#ti)"/>
+        <circle r="210" fill="url(#ti)"/>
+        <circle r="201" fill="#1B1E23"/>
+
+        <!-- fixed outer minute track (ceramic flange) -->
+        <circle r="199" fill="#101217"/>
+        <g id="minTicks"></g>
+
+        <!-- rotating minute ring -->
+        <g id="minRing">
+          <circle r="182" fill="url(#ringDark)" stroke="#2C323C" stroke-width="1"/>
+          <circle r="150" fill="none" stroke="#2C323C" stroke-width="1"/>
+          <rect x="-3" y="-182" width="6" height="32" rx="1.5" fill="var(--accent)"/>
+          <path d="M-5 -186 L0 -197 L5 -186 Z" fill="var(--accent)"/>
+        </g>
+
+        <!-- rotating hour ring -->
+        <g id="hrRing">
+          <circle r="147" fill="#0A0C10" stroke="#2C323C" stroke-width="1"/>
+          <circle r="112" fill="none" stroke="#2C323C" stroke-width="1"/>
+          <rect x="-7" y="-145" width="14" height="30" rx="3" fill="#F1F3F6"/>
+          <rect x="-2" y="-142" width="4" height="24" rx="1" fill="var(--accent)"/>
+        </g>
+
+        <!-- fixed inner hour scale -->
+        <circle r="110" fill="#14171C"/>
+        <g id="hrTicks"></g>
+
+        <!-- polished inner wall (the core) -->
+        <circle r="90" fill="url(#tiIn)"/>
+        <circle r="84" fill="#1B1E23"/>
+
+        <!-- sapphire glare -->
+        <circle r="199" fill="url(#glare)"/>
+      </g>
+      <!-- logo engraving on case flank -->
+      <text x="0" y="207" text-anchor="middle" font-family="Michroma" font-size="7" letter-spacing="3" fill="#2A2E35">ZERO-AXIS</text>
+    </svg>
+  </div>
+</div>
+
+<!-- PRINCIPLES BROKEN -->
+<section>
+  <header>
+    <div class="k">01 · 파괴한 시계공장 원칙</div>
+    <h2>300년 동안 당연했던 여섯 가지를 버렸다</h2>
+    <p>전통 시계는 “중심에 축을 세우고, 위로 다이얼·바늘·유리를 쌓고, 옆에 크라운을 꽂고, 뒤를 덮는다”는 문법으로 만들어집니다. ZERO-AXIS는 이 문법의 모든 줄을 다시 썼습니다 — 단, 전부 오늘의 양산 공정으로.</p>
+  </header>
+  <div class="grid g3">
+    <div class="card rule"><div class="num">01</div><div class="old">모든 바늘은 중심축에서 돈다</div><div class="new">중심축 없음 — 림(Rim) 구동 링</div><p>분·시 표시는 외주부 기어 이빨을 가진 두 개의 허브리스 링이 담당. 피니언이 링의 바깥을 물어 돌리므로 중앙이 완전히 비워집니다.</p></div>
+    <div class="card rule"><div class="num">02</div><div class="old">다이얼은 막혀 있다</div><div class="new">관통 코어 — 손목이 보인다</div><p>지름 16 mm의 관통 구멍. 시계는 원판이 아니라 토러스(도넛)가 되고, 착용자의 피부가 ‘다이얼’이 됩니다. 사람마다 다른 다이얼을 가진 유일한 시계.</p></div>
+    <div class="card rule"><div class="num">03</div><div class="old">시간은 크라운으로 맞춘다</div><div class="new">크라운 없음 — 무천공 케이스</div><p>측면 구멍 0개. 시간은 BLE·장파 표준전파로 자동 동기, 수동 조정은 베젤 측면의 정전식 터치 존. 방수 실패 1순위 부품이 사라졌습니다.</p></div>
+    <div class="card rule"><div class="num">04</div><div class="old">케이스 + 뒷뚜껑 + 무브먼트</div><div class="new">모노코크 — 위에서만 조립</div><p>뒷뚜껑이 없는 일체형 티타늄 셸. 모든 부품은 위 한 방향으로만 적층되어 로봇이 Z축 하나로 조립합니다.</p></div>
+    <div class="card rule"><div class="num">05</div><div class="old">정밀은 장인의 손에서</div><div class="new">정밀은 회로와 센서에서</div><p>고주파 AT컷 수정 + 온도보상으로 연 ±1초. 링 위치는 홀센서가 매시 확인해 충격으로 밀려도 스스로 복귀합니다. 조정 공정이 없습니다.</p></div>
+    <div class="card rule"><div class="num">06</div><div class="old">프리미엄 = 부품 수</div><div class="new">프리미엄 = 소재 · 움직임 · 공백</div><p>부품 수는 기계식의 1/5. 대신 사파이어 링의 ‘떠 있는 회전’, 연마된 내벽, 비어 있는 중심이 가치를 만듭니다.</p></div>
+  </div>
+</section>
+
+<!-- REQUIREMENTS -->
+<section>
+  <header>
+    <div class="k">02 · 다섯 가지 조건 검증</div>
+    <h2>파격이지만, 전부 측정 가능한 숫자로</h2>
+  </header>
+  <div class="grid g5">
+    <div class="card req"><div class="tag">① 제조 가능성</div><div class="big">신규 공정 0</div><p>CNC 티타늄, 사파이어 링 가공, 라바트 스텝모터, SMT, 레이저 용접 — 모두 현재 시계·스마트폰 공급망에 존재하는 공정만 사용.</p></div>
+    <div class="card req"><div class="tag">② 정확도</div><div class="big">±1 s / 년</div><p>단독 동작 기준(8.4 MHz AT컷 수정 + 디지털 온도보상). 동기화 시 오차 &lt; 0.05 s. 홀센서 링 위치 자가보정.</p></div>
+    <div class="card req"><div class="tag">③ 파격</div><div class="big">축 0 · 크라운 0</div><p>관통 코어, 허브리스 회전 링, 무천공 모노코크. 정면에서 봐도, 옆에서 봐도 기존 시계의 실루엣이 아닙니다.</p></div>
+    <div class="card req"><div class="tag">④ 프리미엄</div><div class="big">Ti G5 · 사파이어</div><p>Grade 5 티타늄 모노코크, 링 모양 사파이어 크리스털, 사파이어 디스크 링, 지르코니아 세라믹 플랜지, 경면 연마 내벽.</p></div>
+    <div class="card req"><div class="tag">⑤ 대량 양산</div><div class="big">연 10만 개</div><p>단일 Z축 적층 조립, 수작업 조정 0, 사이클타임 90초/개. 무브먼트는 하나의 모듈로 사전 검사 후 투입.</p></div>
+  </div>
+</section>
+
+<!-- CROSS SECTION -->
+<section>
+  <header>
+    <div class="k">03 · 단면 구조</div>
+    <h2>도넛 안에 모든 것을 감는다</h2>
+    <p>지름 42 mm · 관통부 16 mm · 두께 8.9 mm. 폭 13 mm의 링 모양 공간에 표시계, 구동계, 전원계를 위에서부터 층층이 쌓습니다. 배터리·회로·모터는 모두 링 형태 또는 링을 따라 분산 배치됩니다.</p>
+  </header>
+  <div class="panel">
+    <svg viewBox="0 0 880 330" role="img" aria-label="ZERO-AXIS 단면도">
+      <defs>
+        <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#7A808A" stroke-width="2"/></pattern>
+      </defs>
+      <!-- scale: 1mm = 18px. width 42mm=756, start x=62. thickness 8.9mm ~ 160 -->
+      <g transform="translate(62,60)">
+        <!-- monocoque left & right walls (U-channel) -->
+        <path d="M0 10 L0 150 Q0 160 10 160 L224 160 Q234 160 234 150 L234 10 L224 10 L224 148 L10 148 L10 10 Z" fill="url(#hatch)" stroke="#9AA1AC"/>
+        <path d="M522 10 L522 150 Q522 160 532 160 L746 160 Q756 160 756 150 L756 10 L746 10 L746 148 L532 148 L532 10 Z" fill="url(#hatch)" stroke="#9AA1AC"/>
+        <!-- annular sapphire crystal -->
+        <rect x="0" y="0" width="234" height="12" rx="4" fill="#4BD3F0" fill-opacity=".28" stroke="#4BD3F0"/>
+        <rect x="522" y="0" width="234" height="12" rx="4" fill="#4BD3F0" fill-opacity=".28" stroke="#4BD3F0"/>
+        <!-- minute ring (outer) -->
+        <rect x="16" y="22" width="60" height="8" fill="#C8F04B" fill-opacity=".8"/>
+        <rect x="680" y="22" width="60" height="8" fill="#C8F04B" fill-opacity=".8"/>
+        <!-- hour ring -->
+        <rect x="80" y="34" width="62" height="8" fill="#F1F3F6" fill-opacity=".85"/>
+        <rect x="614" y="34" width="62" height="8" fill="#F1F3F6" fill-opacity=".85"/>
+        <!-- solar flange -->
+        <rect x="146" y="22" width="70" height="6" fill="#6C5CE7" fill-opacity=".8"/>
+        <rect x="540" y="22" width="70" height="6" fill="#6C5CE7" fill-opacity=".8"/>
+        <!-- bearing points -->
+        <circle cx="20" cy="46" r="4" fill="#E0457B"/><circle cx="736" cy="46" r="4" fill="#E0457B"/>
+        <!-- motors + gear train -->
+        <rect x="20" y="56" width="80" height="34" rx="4" fill="#F08A4B" fill-opacity=".7"/>
+        <rect x="656" y="56" width="80" height="34" rx="4" fill="#F08A4B" fill-opacity=".7"/>
+        <!-- annular PCB -->
+        <rect x="14" y="96" width="206" height="8" fill="#2BB673"/>
+        <rect x="536" y="96" width="206" height="8" fill="#2BB673"/>
+        <!-- ring cell -->
+        <rect x="18" y="110" width="198" height="30" rx="6" fill="#8E95A3" fill-opacity=".55" stroke="#8E95A3"/>
+        <rect x="540" y="110" width="198" height="30" rx="6" fill="#8E95A3" fill-opacity=".55" stroke="#8E95A3"/>
+        <!-- core: empty space + wrist -->
+        <rect x="234" y="-10" width="288" height="190" fill="none" stroke="#5B616B" stroke-dasharray="4 5"/>
+        <text x="378" y="80" text-anchor="middle" class="svglabel">관통 코어 Ø16</text>
+        <text x="378" y="98" text-anchor="middle" class="svgtext">공기 · 그리고 손목</text>
+      </g>
+      <!-- labels right side -->
+      <g font-family="IBM Plex Sans KR, sans-serif" font-size="12">
+        <text x="62" y="30" fill="var(--muted)">← 42.0 mm →</text>
+        <text x="62" y="252" fill="#4BD3F0">■ 링형 사파이어 크리스털</text>
+        <text x="62" y="272" fill="#C8F04B">■ 분 링 (사파이어 디스크)</text>
+        <text x="62" y="292" fill="#C6CAD1">■ 시 링</text>
+        <text x="62" y="312" fill="#E0457B">● 루비 3점 지지 베어링</text>
+        <text x="300" y="252" fill="#6C5CE7">■ 링형 솔라셀 (세라믹 플랜지 아래)</text>
+        <text x="300" y="272" fill="#F08A4B">■ 라바트 스텝모터 ×2 + 피니언</text>
+        <text x="300" y="292" fill="#2BB673">■ 링형 FPCB (MCU·BLE·TCXO·홀센서)</text>
+        <text x="300" y="312" fill="#8E95A3">■ 링형 리튬이온 셀 / 티타늄 모노코크(빗금)</text>
+        <text x="620" y="252" fill="var(--muted)">두께 8.9 mm</text>
+        <text x="620" y="272" fill="var(--muted)">10 bar 방수</text>
+        <text x="620" y="292" fill="var(--muted)">측면 천공 0</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- HOW IT KEEPS TIME -->
+<section>
+  <header>
+    <div class="k">04 · 구동과 정확도</div>
+    <h2>링을 돌리는 것은 바깥이다</h2>
+  </header>
+  <div class="grid g3">
+    <div class="card"><h3>림 드라이브</h3><p>분 링·시 링의 외주에 0.08 모듈 기어 이빨(LIGA 니켈-인 또는 사출 LCP)을 성형. 각 링은 전용 라바트 모터 + 2단 감속 피니언 하나가 바깥에서 물고 돌립니다. 링은 루비 롤러 3점으로 떠 있어 중심 지지가 필요 없습니다.</p></div>
+    <div class="card"><h3>스텝 해상도</h3><p>분 링 360 스텝/시간(10초마다 1°), 시 링 360 스텝/12시간(2분마다 1°). 눈에는 ‘천천히 흐르는’ 것처럼 보이면서 소비전력은 일반 3침 쿼츠 수준.</p></div>
+    <div class="card"><h3>시간 기준</h3><p>8.388608 MHz AT컷 수정 + 1분 간격 온도 측정 디지털 보상 → 단독 연 ±1초. BLE(스마트폰) 또는 장파 표준전파로 하루 1회 동기 시 오차 &lt; 0.05초.</p></div>
+    <div class="card"><h3>자가 위치보정</h3><p>각 링에 미세 자석 1개, FPCB에 홀센서 2개. 매 정시 링이 원점을 지날 때 위치를 확인하고, 낙하 충격으로 어긋나면 자동으로 되돌립니다.</p></div>
+    <div class="card"><h3>전원</h3><p>세라믹 플랜지 아래 링형 솔라셀 + 링형 리튬이온 셀. 완충 시 빛 없이 8개월. 무선(Qi 미니) 보조 충전 가능 — 커넥터 구멍 없음.</p></div>
+    <div class="card"><h3>조작</h3><p>크라운 대신 케이스 측면 2시·4시 지점의 정전식 존(티타늄 아래 절연 전극). 길게 쓸면 타임존 이동, 두 번 탭하면 링이 원점을 돌아 동기 상태를 보여줍니다.</p></div>
+  </div>
+</section>
+
+<!-- PRODUCTION -->
+<section>
+  <header>
+    <div class="k">05 · 양산 공정</div>
+    <h2>Z축 하나로 끝나는 조립 라인</h2>
+    <p>뒷뚜껑이 없으므로 모든 부품이 위에서 아래로 한 방향으로만 들어갑니다. 뒤집기·측면 삽입·수작업 조정이 없어 6축 로봇 대신 저가의 직교 로봇으로 라인을 구성합니다.</p>
+  </header>
+  <ol class="flow" style="padding:0;margin:0">
+    <li><b>모노코크 가공</b><span>Ti G5 봉재 5축 CNC → 내벽 경면 연마 → 측면 정전 존 절연 인서트</span></li>
+    <li><b>전원 모듈</b><span>링형 셀 + FPCB 사전 결합, 기능 검사 후 트레이 투입</span></li>
+    <li><b>구동 모듈</b><span>스텝모터 2개 + 피니언 + 루비 롤러를 서브 플레이트에 SMT식 실장</span></li>
+    <li><b>링 적층</b><span>시 링 → 분 링 순서로 낙하 삽입, 비전 카메라로 원점 정렬</span></li>
+    <li><b>플랜지 · 솔라</b><span>지르코니아 플랜지(인쇄 눈금) + 솔라셀 압입</span></li>
+    <li><b>크리스털 봉합</b><span>링형 사파이어 + 티타늄 리테이너 링, 내·외주 2중 레이저 용접</span></li>
+    <li><b>자동 검사</b><span>헬륨 리크 10 bar, 72시간 온도 사이클 보정값 기록, 링 위치 홀 검증</span></li>
+  </ol>
+</section>
+
+<!-- BOM -->
+<section>
+  <header>
+    <div class="k">06 · 원가 구조 (연 10만 개 기준 추정)</div>
+    <h2>원가 약 9만 원, 판매가 180만 원대</h2>
+    <p>프리미엄은 부품 수가 아니라 소재와 아이디어에서 나옵니다. 아래는 공개된 부품 시세를 바탕으로 한 개략 추정치이며, 실제 견적은 공급사 RFQ로 확정해야 합니다.</p>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>모듈</th><th>사양</th><th style="text-align:right">개당 (원)</th></tr></thead>
+      <tbody>
+        <tr><td>모노코크 케이스</td><td>Ti G5, 5축 CNC, 내벽 경면</td><td class="n">24,000</td></tr>
+        <tr><td>링형 사파이어 크리스털</td><td>OD 40 / ID 18, AR 코팅</td><td class="n">15,000</td></tr>
+        <tr><td>표시 링 ×2</td><td>사파이어 디스크 + LCP 기어 + 루미노바</td><td class="n">9,000</td></tr>
+        <tr><td>구동계</td><td>라바트 모터 ×2, 피니언, 루비 롤러 ×6</td><td class="n">6,500</td></tr>
+        <tr><td>전자</td><td>BLE MCU, AT컷 수정, 온도센서, 홀센서 ×2, FPCB</td><td class="n">7,000</td></tr>
+        <tr><td>전원</td><td>링형 솔라셀 + 링형 Li-ion 셀</td><td class="n">6,000</td></tr>
+        <tr><td>세라믹 플랜지</td><td>지르코니아 CIM, 패드 인쇄 눈금</td><td class="n">3,500</td></tr>
+        <tr><td>스트랩</td><td>FKM 러버, 티타늄 버클</td><td class="n">8,000</td></tr>
+        <tr><td>조립 · 검사 · 수율손실</td><td>자동 라인, 수율 94% 가정</td><td class="n">9,000</td></tr>
+        <tr><td>패키지</td><td>-</td><td class="n">4,000</td></tr>
+      </tbody>
+      <tfoot><tr><td>합계</td><td>목표 판매가 1,790,000원 (원가율 약 5%, 유통·마케팅 별도)</td><td class="n">92,000</td></tr></tfoot>
+    </table>
+  </div>
+</section>
+
+<!-- RISKS -->
+<section>
+  <header>
+    <div class="k">07 · 기술 리스크와 대응</div>
+    <h2>파격의 대가는 미리 계산한다</h2>
+  </header>
+  <div class="panel tablewrap">
+    <table class="risk">
+      <thead><tr><th>리스크</th><th>내용</th><th>대응</th></tr></thead>
+      <tbody>
+        <tr><td>관통부 방수</td><td>밀봉면이 외주·내주 2곳으로 늘어남</td><td>링형 사파이어를 티타늄 리테이너에 활성 브레이징 후 내·외주 레이저 용접. 개스킷 의존 0.</td></tr>
+        <tr><td>링 흔들림</td><td>중심 지지 없는 링의 편심·소음</td><td>루비 롤러 3점 + 판스프링 1점 예압. 링 두께 0.6 mm 사파이어로 강성 확보.</td></tr>
+        <tr><td>배터리 형상</td><td>링형 셀 공급처 제한</td><td>1차안: 링형 맞춤 셀. 2차안: 소형 코인셀 4개를 링 위에 분산 직렬 배치.</td></tr>
+        <tr><td>BLE 안테나</td><td>티타늄 모노코크가 전파 차폐</td><td>링형 사파이어 크리스털 아래에 안테나 패턴, 크리스털 면을 RF 창으로 사용.</td></tr>
+        <tr><td>가독성</td><td>링 위 표시가 익숙하지 않음</td><td>분=긴 형광 바, 시=굵은 흰 바로 형태 대비. 고정 눈금은 바깥 60·안쪽 12로 분리.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>ZERO-AXIS · 콘셉트 디자인 문서 · 수치(원가·정확도·전원)는 공개 부품 사양 기반 설계 목표치이며 시제품 검증이 필요합니다.</footer>
+</div>
+
+<script>
+(function(){
+  const NS="http://www.w3.org/2000/svg";
+  const mt=document.getElementById("minTicks"), ht=document.getElementById("hrTicks");
+  for(let i=0;i<60;i++){
+    const a=i*6*Math.PI/180, big=i%5===0;
+    const r1=198, r2=big?186:191;
+    const l=document.createElementNS(NS,"line");
+    l.setAttribute("x1",r1*Math.sin(a)); l.setAttribute("y1",-r1*Math.cos(a));
+    l.setAttribute("x2",r2*Math.sin(a)); l.setAttribute("y2",-r2*Math.cos(a));
+    l.setAttribute("stroke",big?"#E6E9EE":"#5B616B"); l.setAttribute("stroke-width",big?2.4:1.2);
+    mt.appendChild(l);
+  }
+  for(let i=0;i<12;i++){
+    const a=i*30*Math.PI/180;
+    if(i%3===0){
+      const t=document.createElementNS(NS,"text");
+      t.setAttribute("x",100*Math.sin(a)); t.setAttribute("y",-100*Math.cos(a)+3.5);
+      t.setAttribute("text-anchor","middle"); t.setAttribute("font-family","Michroma, sans-serif");
+      t.setAttribute("font-size","10"); t.setAttribute("fill","#E6E9EE");
+      t.textContent=i===0?12:i; ht.appendChild(t);
+    }else{
+      const c=document.createElementNS(NS,"circle");
+      c.setAttribute("cx",100*Math.sin(a)); c.setAttribute("cy",-100*Math.cos(a));
+      c.setAttribute("r",2); c.setAttribute("fill","#8E95A3"); ht.appendChild(c);
+    }
+  }
+  const minRing=document.getElementById("minRing"), hrRing=document.getElementById("hrRing"), ro=document.getElementById("readout");
+  const bLive=document.getElementById("bLive"), bFast=document.getElementById("bFast");
+  let fast=false, base=Date.now(), simBase=Date.now();
+  let lastSim=Date.now();
+  bLive.onclick=()=>{fast=false;bLive.setAttribute("aria-pressed","true");bFast.setAttribute("aria-pressed","false");};
+  bFast.onclick=()=>{base=Date.now();simBase=lastSim;fast=true;bLive.setAttribute("aria-pressed","false");bFast.setAttribute("aria-pressed","true");};
+  function tick(){
+    const real=Date.now();
+    lastSim = fast ? simBase+(real-base)*600 : real;
+    const d=new Date(lastSim);
+    const secOfHour=d.getMinutes()*60+d.getSeconds();
+    const minDeg=Math.floor(secOfHour/10);               // 1° per 10 s step
+    const secOf12=(d.getHours()%12)*3600+secOfHour;
+    const hrDeg=Math.floor(secOf12/120);                 // 1° per 2 min step
+    minRing.setAttribute("transform","rotate("+minDeg+")");
+    hrRing.setAttribute("transform","rotate("+hrDeg+")");
+    const p=n=>String(n).padStart(2,"0");
+    ro.textContent=p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds());
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+</body>
+</html>
