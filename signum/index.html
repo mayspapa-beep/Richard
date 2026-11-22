@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIGNUM 시계</title>
+<meta name="description" content="다이얼 자체가 복제 불가능한 물리적 지문인 시계 — 사파이어 속 무작위 각인점이 바늘이 되고, 스마트폰으로 진품을 스스로 증명한다. 설계·보안 검증 포함 최종 모델.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans+KR:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#07080A;--bg2:#0E1014;--surface:#13161C;--line:#22262E;--line2:#343A45;
+  --ink:#ECEEF2;--muted:#8E95A3;--accent:#C8F04B;--accent2:#4BD3F0;--warn:#F08A4B;
+  --ti1:#9AA1AC;--ti2:#5B616B;--ti3:#2A2E35;--sap:rgba(30,40,55,.55);
+  --f-d:"Michroma","IBM Plex Sans KR",sans-serif;--f-b:"IBM Plex Sans KR",system-ui,sans-serif;--f-m:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+  --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+    --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);line-height:1.7;font-size:15px}
+.wrap{max-width:1120px;margin:0 auto;padding:48px 16px 80px}
+h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+p{margin:0}
+.k{font:500 11px var(--f-m);letter-spacing:.18em;color:var(--accent);text-transform:uppercase}
+.muted{color:var(--muted)}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero h1{font-family:var(--f-d);font-weight:400;font-size:clamp(34px,6vw,58px);letter-spacing:.08em;line-height:1.1;margin:14px 0 18px}
+.hero .lead{font-size:17px;color:var(--muted);max-width:32em}
+.stage{position:relative;aspect-ratio:1/1.18;max-width:520px;width:100%;margin:0 auto}
+.stage svg{width:100%;height:100%;display:block}
+.readout{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:22px}
+.time{font:500 28px var(--f-m);letter-spacing:.06em}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font:500 12px var(--f-m);letter-spacing:.08em;background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:999px;padding:8px 14px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:#0A0C08;border-color:var(--accent)}
+/* sections */
+section{padding-top:72px}
+section > header{margin-bottom:28px;max-width:46em}
+section > header h2{font-size:clamp(22px,3.2vw,30px);margin-top:10px}
+section > header p{color:var(--muted);margin-top:10px}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.g5{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0}
+.card h3{font-size:16px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:14px}
+.rule{display:flex;flex-direction:column;gap:10px}
+.rule .old{font:500 12px var(--f-m);color:var(--muted);text-decoration:line-through;text-decoration-color:var(--warn)}
+.rule .new{font-size:16px;font-weight:600}
+.num{font:400 30px var(--f-d);color:var(--accent);line-height:1}
+.req .tag{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--accent2)}
+.req .big{font:500 22px var(--f-m);margin:8px 0 6px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;overflow:hidden}
+.panel svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+td.n{font-family:var(--f-m);text-align:right;white-space:nowrap}
+tfoot td{font-weight:600;border-bottom:none}
+.tablewrap{overflow-x:auto}
+.flow{counter-reset:s;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.flow li{list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;font-size:14px}
+.flow li::before{counter-increment:s;content:"0" counter(s);display:block;font:500 12px var(--f-m);color:var(--accent);margin-bottom:6px}
+.flow li b{display:block;margin-bottom:4px}
+.flow li span{color:var(--muted)}
+.svgtext{font-family:var(--f-m);font-size:11px;fill:var(--muted)}
+.svglabel{font-family:var(--f-b);font-size:12px;fill:var(--ink)}
+footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.risk td:first-child{font-weight:600;white-space:nowrap}
+</style>
+<style>
+.nav{display:flex;gap:16px;flex-wrap:wrap;font:500 12px var(--f-m);letter-spacing:.08em;margin-bottom:40px}
+.nav a{color:var(--muted);text-decoration:none;border-bottom:1px solid transparent}
+.nav a[aria-current]{color:var(--ink);border-color:var(--accent)}
+.stage{position:relative}
+#dial{position:absolute;left:8.75%;top:15.14%;width:82.5%;height:69.72%;border-radius:50%}
+.serials{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.callout{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:18px 20px;font-size:15px}
+.callout b{color:var(--accent)}
+.callout.warn{border-left-color:var(--warn)}
+.callout.warn b{color:var(--warn)}
+.verify{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.verify{grid-template-columns:1fr}}
+.verify canvas{width:100%;display:block;border-radius:10px;background:#05070A}
+.vbtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.result{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:12px}
+.result .card{padding:14px}
+.result .lab{font:500 11px var(--f-m);letter-spacing:.1em;color:var(--muted)}
+.result .val{font:500 20px var(--f-m);margin-top:4px}
+.ok{color:var(--accent)} .ng{color:var(--warn)}
+.st{font:500 11px var(--f-m);letter-spacing:.06em;padding:2px 8px;border-radius:999px;border:1px solid var(--line2);white-space:nowrap}
+.st.calc{color:var(--accent);border-color:var(--accent)}
+.st.lit{color:var(--accent2);border-color:var(--accent2)}
+.st.todo{color:var(--warn);border-color:var(--warn)}
+td a{color:var(--accent2)}
+.gate{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.gate .card .when{font:500 12px var(--f-m);color:var(--accent)}
+.gate .card .pass{font-size:13px;margin-top:8px;color:var(--ink)}
+code{font-family:var(--f-m);font-size:13px;background:var(--bg2);padding:1px 6px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="nav"><a href="../zero-axis/">01 ZERO-AXIS</a><a href="../linea/">02 LINEA</a><a href="../still/">03 STILL</a><a href="../flux/">04 FLUX</a><a href="../coda/">05 CODA</a><a href="./" aria-current="page">06 SIGNUM · 최종</a></nav>
+
+<div class="hero">
+  <div>
+    <div class="k">Final Model · Physically Unclonable Chronometer</div>
+    <h1>SIGNUM</h1>
+    <p class="lead">다이얼이 곧 <b>지문</b>인 시계. 사파이어 속에 무작위로 새긴 1만 3천여 개의 미세 각인점이 별무리를 이루고, 빛이 지나가면 그 점들이 <b>바늘</b>이 됩니다. 점의 배치는 만든 회사조차 다시 만들 수 없습니다. 그래서 이 시계는 스마트폰 앞에서 <b>자신이 진품임을 스스로 증명</b>합니다.</p>
+    <div class="serials" role="group" aria-label="개체 선택">
+      <button data-serial="1" aria-pressed="true">No. 0001</button>
+      <button data-serial="2" aria-pressed="false">No. 0002</button>
+      <button data-serial="3" aria-pressed="false">No. 0003</button>
+    </div>
+    <div class="readout">
+      <div class="time" id="readout">--:--:--</div>
+      <div class="btns"><button id="bFast" aria-pressed="false">빨리감기 ×300</button></div>
+    </div>
+    <p class="muted" style="font-size:13px;margin-top:10px">개체 번호를 바꿔 보세요. 같은 모델인데 별무리와 바늘의 반짝임이 완전히 다릅니다. 각 개체의 각인점 배치를 시뮬레이션으로 생성해 그렸습니다.</p>
+  </div>
+  <div class="stage">
+    <svg viewBox="-240 -284 480 568" role="img" aria-label="SIGNUM 상면도">
+      <defs>
+        <linearGradient id="ti" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D0D5DC"/><stop offset=".5" stop-color="#5A6069"/><stop offset="1" stop-color="#B3B9C2"/></linearGradient>
+        <linearGradient id="strap" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#15171B"/><stop offset=".5" stop-color="#2A2D33"/><stop offset="1" stop-color="#15171B"/></linearGradient>
+      </defs>
+      <path d="M-86 -190 L-80 -284 L80 -284 L86 -190 Z" fill="url(#strap)"/>
+      <path d="M-86 190 L-80 284 L80 284 L86 190 Z" fill="url(#strap)"/>
+      <circle r="214" fill="url(#ti)"/>
+      <circle r="205" fill="#0B0D11"/>
+      <circle r="199" fill="#05070A"/>
+      <text x="0" y="211" text-anchor="middle" font-family="Michroma" font-size="7" letter-spacing="3" fill="#2A2E35">SIGNUM</text>
+    </svg>
+    <canvas id="dial" width="800" height="800" aria-hidden="true"></canvas>
+  </div>
+</div>
+
+<section>
+  <header>
+    <div class="k">00 · 출발점 — 무엇을 ‘흉내낼 수 없다’고 할 것인가</div>
+    <h2>모양은 누구나 베낀다. 그래서 모양에 가치를 두지 않았다</h2>
+  </header>
+  <div class="callout">조사 결과, 중국 시계 산업은 1965년 튜닝포크 무브먼트 역설계부터 오늘날의 멀티축 투르비용까지 <b>기계 구조와 외형을 복제하는 능력이 이미 세계 최고 수준</b>입니다. 앞선 다섯 콘셉트(회전 링·셔틀·빛·액체·모듈)는 모두 시간과 돈만 들이면 따라 만들 수 있고, 자성 액체 시계는 이미 여러 콘셉트가 공개돼 있습니다.<br><br>
+  그래서 SIGNUM은 질문을 바꿨습니다. <b>“베낄 수 없는 모양”이 아니라 “베껴도 가치가 0이 되는 구조”</b>. 시계의 가치를 개체마다 하나뿐인 물리적 지문에 묶고, 누구나 스마트폰으로 그 지문을 확인할 수 있게 하면, 겉모습만 같은 복제품은 진품으로 팔릴 수 없습니다.</div>
+</section>
+
+<section>
+  <header>
+    <div class="k">01 · 파괴한 시계공장 원칙</div>
+    <h2>“같은 모델은 똑같아야 한다”를 뒤집다</h2>
+    <p>시계 공장의 품질이란 1만 개를 똑같이 만드는 것입니다. SIGNUM의 품질은 1만 개를 <b>전부 다르게</b>, 그리고 그 차이를 증명 가능하게 만드는 것입니다.</p>
+  </header>
+  <div class="grid g3">
+    <div class="card rule"><div class="num">01</div><div class="old">같은 모델은 똑같이 생겼다</div><div class="new">모든 개체가 다르다</div><p>각인점 배치는 공장 장비의 물리 난수 발생기와 레이저 가공 자체의 무작위성으로 결정. 두 개가 같을 확률은 사실상 0.</p></div>
+    <div class="card rule"><div class="num">02</div><div class="old">진품 확인은 전문가가 한다</div><div class="new">시계가 스스로 증명한다</div><p>스마트폰 앱이 무작위 문제를 내면, 시계가 자기 LED로 다이얼을 비춰 답합니다. 답은 그 다이얼만 낼 수 있습니다.</p></div>
+    <div class="card rule"><div class="num">03</div><div class="old">보증서는 종이·NFC 태그다</div><div class="new">다이얼 자체가 보증서다</div><p>떼어 옮길 수 있는 태그가 아닙니다. 시간을 보여주는 바로 그 각인점들이 신원입니다. 부품을 옮겨 심으면 지문이 어긋납니다.</p></div>
+    <div class="card rule"><div class="num">04</div><div class="old">바늘은 공장에서 찍어낸 금속이다</div><div class="new">바늘은 그 시계만의 별빛이다</div><p>바늘은 빛줄기가 지나가는 자리의 각인점이 빛나 생깁니다. 점 배치가 다르니 바늘의 반짝임도 개체마다 다릅니다.</p></div>
+    <div class="card rule"><div class="num">05</div><div class="old">정확도는 무브먼트의 몫이다</div><div class="new">표시 오차 0, 시간 오차 연 ±1초</div><p>바늘 위치는 어느 LED를 켜느냐로 정해지는 디지털 주소. 고정밀 AT컷 수정 + 온도보상(양산품 연 ±1초 사례 존재) + 동기.</p></div>
+    <div class="card rule"><div class="num">06</div><div class="old">시계의 이력은 사라진다</div><div class="new">소유 이력이 시계에 묶인다</div><p>인증할 때마다 소유권 이전·서비스 기록이 그 개체의 지문에 연결됩니다. 중고 거래에서 진품과 이력이 즉시 확인됩니다.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">02 · 작동 원리</div>
+    <h2>별무리, 빛줄기, 그리고 지문</h2>
+  </header>
+  <div class="grid g3">
+    <div class="card"><h3>① 무작위 별무리</h3><p>Ø38 사파이어 2층 구조. 분 층에는 60개의 방사면 안에 면당 약 220개, 시 층에는 반경 11 mm 안쪽에 면당 약 120개의 각인점을 펨토초 레이저로 새깁니다. 면 위의 정확한 위치와 각 점의 산란 세기는 무작위입니다.</p></div>
+    <div class="card"><h3>② 빛의 바늘</h3><p>테두리에 120개의 마이크로 LED + 원통형 마이크로렌즈. 켜진 LED의 빛줄기는 반발산각 1.4°로 좁게 퍼지며 해당 방사면의 각인점만 비춥니다. 그 점들이 빛나 분·시 바늘이 됩니다.</p></div>
+    <div class="card"><h3>③ 문제와 답</h3><p>인증 시 서버가 아직 쓰지 않은 LED 조합(12개 + 세기 3단계)을 문제로 냅니다. 시계가 그 조합을 켜면 각인점이 만드는 밝기 무늬가 답이 되고, 스마트폰 카메라가 이를 촬영합니다.</p></div>
+    <div class="card"><h3>④ 두 개의 열쇠</h3><p>광학 지문만으로는 고도로 장비를 갖춘 공격자를 완전히 막지 못한다는 것이 시뮬레이션으로 확인됐습니다(05 섹션). 그래서 보안 인증칩(EAL6+ 등급 보안 요소)이 개체별 비밀키로 문제에 서명합니다. <b>둘 다 맞아야</b> 진품입니다.</p></div>
+    <div class="card"><h3>⑤ 공장 등록</h3><p>출고 전 고정 지그와 기준 카메라로 개체당 2,000개의 문제-답 쌍을 촬영해 서버에 저장(약 40초, 개체당 약 0.5 MB). 각 문제는 한 번만 사용합니다.</p></div>
+    <div class="card"><h3>⑥ 평소엔 시계</h3><p>손목을 들면 3초간 바늘이 떠오릅니다. 인증은 필요할 때만, 앱으로 10초. 화면·알림·심박 없음 — 시계로서의 정체성은 그대로.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">03 · 인증 시뮬레이터</div>
+    <h2>직접 위조해 보세요</h2>
+    <p>개체 No. 0001의 공장 등록 데이터와 새 촬영 결과를 비교합니다. 실제 검증 스크립트(<code>verify/puf_sim.py</code>)와 같은 원리를 단순화해 브라우저에서 계산합니다. 매번 새 문제와 새 촬영 노이즈로 다시 계산됩니다.</p>
+  </header>
+  <div class="vbtns" role="group" aria-label="인증 대상">
+    <button data-case="genuine" aria-pressed="true">진품</button>
+    <button data-case="other" aria-pressed="false">외형 복제품</button>
+    <button data-case="transplant" aria-pressed="false">진품 칩 이식품</button>
+    <button data-case="clone" aria-pressed="false">정밀 복제 (세기 통제 불가)</button>
+    <button data-case="clone2" aria-pressed="false">정밀 복제 (세기 ±30% 통제)</button>
+  </div>
+  <div class="verify">
+    <div><canvas id="vdial" width="600" height="600" aria-label="문제 패턴으로 비춘 다이얼"></canvas><p class="muted" style="font-size:12px;margin-top:6px">문제: 켜진 LED 12개와 세기</p></div>
+    <div>
+      <div class="panel" style="padding:10px"><canvas id="vprof" width="900" height="300" aria-label="등록 프로파일과 촬영 프로파일 비교"></canvas></div>
+      <p class="muted" style="font-size:12px;margin-top:6px">첫 번째 켜진 방사면의 밝기 프로파일 — <span style="color:#C8F04B">등록값</span> vs <span style="color:#F08A4B">이번 촬영</span></p>
+      <div class="result">
+        <div class="card"><div class="lab">광학 지문 불일치</div><div class="val" id="rHD">-</div><div class="muted" style="font-size:12px">기준 15% 미만</div></div>
+        <div class="card"><div class="lab">보안칩 서명</div><div class="val" id="rSE">-</div><div class="muted" style="font-size:12px">개체별 비밀키</div></div>
+        <div class="card"><div class="lab">판정</div><div class="val" id="rV">-</div><div class="muted" style="font-size:12px" id="rWhy"></div></div>
+      </div>
+      <div style="margin-top:10px"><button id="vAgain">새 문제로 다시</button></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">04 · 위조 시나리오 레드팀 분석</div>
+    <h2>중국 공장이 시도할 수 있는 모든 것</h2>
+    <p>공격자의 능력을 단계별로 높여 가며, 각 단계에서 무엇이 막는지와 비용을 따졌습니다. 비용은 공개 장비 시세 기반의 개략 추정입니다.</p>
+  </header>
+  <div class="panel tablewrap">
+    <table class="risk">
+      <thead><tr><th>단계</th><th>공격</th><th>결과</th><th>막는 것</th></tr></thead>
+      <tbody>
+        <tr><td>L1</td><td>외형 복제: K9 유리 + 나노초 레이저 각인(기념품 공정) + LED. 개당 수만 원.</td><td class="ng">인증 실패 100%</td><td>광학 지문 불일치(시뮬레이션 HD 49%) + 보안칩 없음. 외관상으로도 나노초 각인은 미세 균열로 뿌옇게 보임.</td></tr>
+        <tr><td>L2</td><td>진품을 구입해 역설계, 펨토초 장비로 같은 공정 구현. 장비 수억 원.</td><td class="ng">인증 실패 100%</td><td>자기 개체는 만들 수 있어도 서버 등록부에 없음. 진품의 ‘지문’을 만드는 것이 아니라 새 지문을 만들 뿐.</td></tr>
+        <tr><td>L3</td><td>고장난 진품의 보안칩·기판을 위조 케이스에 이식.</td><td class="ng">인증 실패 100%</td><td>칩 서명은 맞지만 다이얼 지문이 등록값과 다름(HD 49%). 칩과 다이얼이 짝으로 등록됨.</td></tr>
+        <tr><td>L4</td><td>특정 진품 1개를 정밀 복제: 사파이어 내부 약 2만 개 점을 3D 측정(공초점/OCT) 후 재각인. 세기는 통제 못함.</td><td class="ng">광학 통과 확률 약 10⁻¹⁰/회</td><td>각인점 세기(형태)의 무작위성. 위치를 1 µm까지 맞춰도 HD 24%로 기준 초과.</td></tr>
+        <tr><td>L5</td><td>L4 + 점마다 세기를 ±30% 이내로 맞추는 반복 보정 각인.</td><td>광학은 통과 <span class="st todo">한계 인정</span></td><td>보안칩 개체 키 추출이 추가로 필요. 인증 등급 보안칩의 물리 공격은 개체마다 실험실 공격이 필요하고, 성공해도 복제품 1개만 나옴 → 대량 위조 사업이 성립하지 않음.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn" style="margin-top:14px"><b>솔직한 결론:</b> 어떤 물건도 ‘절대’ 복제 불가능하지 않습니다. SIGNUM이 보장하는 것은 (1) 외형 복제품은 100% 걸러지고, (2) 특정 진품을 복제하는 비용이 그 시계 가격보다 훨씬 크며, (3) 성공해도 한 개씩만 가능해 <b>위조가 사업이 되지 않는다</b>는 것입니다. L5 단계의 실제 난이도는 시편 레드팀 시험(Gate 2)으로 확인해야 합니다.</div>
+</section>
+
+<section>
+  <header>
+    <div class="k">05 · 검증 결과</div>
+    <h2>주장마다 근거를 붙였다</h2>
+    <p>각 항목에 <span class="st calc">계산·시뮬레이션</span> <span class="st lit">문헌</span> <span class="st todo">시편 필요</span> 상태를 표시했습니다. 계산 스크립트는 저장소의 <code>signum/verify/</code>에 있어 가정을 바꿔 다시 실행할 수 있습니다.</p>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>항목</th><th>가정 · 방법</th><th>결과</th><th>상태</th></tr></thead>
+      <tbody>
+        <tr><td>빔 폭</td><td>100 µm 마이크로 LED, 초점 2 mm 원통 렌즈, 경로 17 mm</td><td>반발산각 1.43°, 중심부 도달 폭 0.95 mm</td><td><span class="st calc">계산</span></td></tr>
+        <tr><td>바늘 휘도</td><td>LED 광출력 3 mW, 결합 50%, 산란 40%, 상향 50%</td><td>녹색 약 5,100 cd/m² (청록 약 2,300)</td><td><span class="st calc">계산</span> <span class="st todo">산란 40% 실측</span></td></tr>
+        <tr><td>햇빛 가독성</td><td>10만 lux, AR 코팅 + 무광 흑색 세라믹 배경 반사 2.5%</td><td>대비 7.5:1 (AR 없으면 3.3:1)</td><td><span class="st calc">계산</span></td></tr>
+        <tr><td>전력</td><td>하루 150회 확인, 20% 야외 최대 밝기, 3초 점등</td><td>하루 약 1.04 mAh → 100 mAh 셀 약 96일</td><td><span class="st calc">계산</span></td></tr>
+        <tr><td>진품 통과율</td><td>폰 촬영 노이즈 4%, 정렬 오차 12 µm·0.05°, 60회</td><td>1회 98.3% · 3회 중 2회 규칙 시 거부율 약 0.3%</td><td><span class="st calc">시뮬레이션</span></td></tr>
+        <tr><td>다른 개체 구별</td><td>무작위 다른 개체, 60회</td><td>HD 49.1% ± 1.4% (이상값 50%) · 오인 0건</td><td><span class="st calc">시뮬레이션</span></td></tr>
+        <tr><td>정밀 복제 (세기 통제 불가)</td><td>위치 오차 1 µm / 10 µm</td><td>HD 23.6% / 23.8% → 통과 확률 약 10⁻¹⁰</td><td><span class="st calc">시뮬레이션</span></td></tr>
+        <tr><td>정밀 복제 (세기 ±30%)</td><td>위치 3 µm + 세기 오차 30%</td><td>HD 11.6% → <b>광학만으로는 통과</b></td><td><span class="st calc">시뮬레이션</span> → 보안칩으로 차단</td></tr>
+        <tr><td>정확도 연 ±1초</td><td>고주파 AT컷 수정 + 온도보상</td><td>양산 손목시계에서 연 ±1초 구현 사례: <a href="https://citizenwatch-global.com/news/2019/20190320-1/index.html">Citizen Caliber 0100 (8.4 MHz AT컷, 2019)</a></td><td><span class="st lit">문헌</span></td></tr>
+        <tr><td>광학 PUF 원리</td><td>다중 산란 무작위 구조의 복제 불가능성</td><td><a href="https://cba.mit.edu/docs/papers/02.09.POWF.pdf">Pappu 외, Science 2002</a>; 레이저 각인 PUF <a href="https://perso.uclouvain.be/fstandae/PUBLIS/76.pdf">UCLouvain</a></td><td><span class="st lit">문헌</span></td></tr>
+        <tr><td>사파이어 내부 펨토초 각인</td><td>단결정 사파이어 내부 마킹 가능 여부</td><td>사파이어·루비 내부 펨토초 QR 각인 <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6586618/">Sci. Rep. 2019</a>; 시계 크리스털 마킹 특허 <a href="https://patents.google.com/patent/US11320790">US11320790</a></td><td><span class="st lit">문헌</span></td></tr>
+        <tr><td>2층 도파 · 층간 누광</td><td>저굴절 접착층 전반사</td><td>미검증</td><td><span class="st todo">시편 필요</span></td></tr>
+        <tr><td>폰 기종 간 재현성</td><td>카메라·렌즈·자동처리 차이</td><td>시뮬레이션은 단일 카메라 모델</td><td><span class="st todo">시편 필요</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">06 · 선행 사례와 차별점</div>
+    <h2>있는 것과 없는 것</h2>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>선행 사례</th><th>무엇인가</th><th>SIGNUM과의 차이</th></tr></thead>
+      <tbody>
+        <tr><td>크리스털 내부 로고 각인</td><td>고급 시계의 사파이어 내부 미세 로고(<a href="https://www.bobswatches.com/rolex-blog/just-because/luxury-watch-easter-eggs.html">예시</a>), 사파이어 마킹 특허(<a href="https://patents.google.com/patent/US11320790">US11320790</a>)</td><td>모든 개체에 같은 로고 → 복제 가능, 개체 식별 불가. SIGNUM은 개체마다 다른 무작위 구조.</td></tr>
+        <tr><td>NFC·블록체인 디지털 보증서</td><td>칩이나 카드에 보증 정보 저장</td><td>태그를 떼어 다른 물건에 붙일 수 있음. SIGNUM은 시간을 표시하는 다이얼 자체가 신원.</td></tr>
+        <tr><td>광학 PUF 연구</td><td><a href="https://cba.mit.edu/docs/papers/02.09.POWF.pdf">Pappu 2002</a>, 레이저 각인 PUF(<a href="https://perso.uclouvain.be/fstandae/PUBLIS/76.pdf">UCLouvain</a>)</td><td>별도 판독 장비 필요. SIGNUM은 시계 자신의 LED가 문제를 비추고 일반 스마트폰이 판독.</td></tr>
+        <tr><td>LED + 내부 각인 크리스털</td><td>기념품용 레이저 각인 유리 조명</td><td>장식용 고정 무늬. 시간 표시·개체 인증 기능 없음.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="muted" style="font-size:13px;margin-top:10px">이 표는 웹 검색 기반 예비 조사입니다. 특허 출원 전 변리사의 정식 선행기술·침해(FTO) 조사가 필요합니다(Gate 0). 출원 후보: “시간 표시 광원이 개체 고유 각인 구조를 조명해 문제-답 인증을 수행하는 시계”.</p>
+</section>
+
+<section>
+  <header>
+    <div class="k">07 · 제조와 원가</div>
+    <h2>원가 약 8.5만 원, 판매가 239만 원대</h2>
+    <p>공개 시세 기반 개략 추정이며 공급사 RFQ로 확정해야 합니다.</p>
+  </header>
+  <ol class="flow" style="padding:0;margin:0 0 14px">
+    <li><b>사파이어 2층</b><span>Ø38 디스크 2장 양면 연마, 저굴절 광학 접합</span></li>
+    <li><b>무작위 각인</b><span>물리 난수로 생성한 배치를 펨토초로 각인, 약 40초/개</span></li>
+    <li><b>LED 링</b><span>마이크로 LED 120 + 마이크로렌즈 링 정렬</span></li>
+    <li><b>보안칩 짝짓기</b><span>보안칩 키 생성(칩 내부, 외부 유출 없음) + 다이얼과 짝 등록</span></li>
+    <li><b>지문 등록</b><span>고정 지그 카메라로 문제-답 2,000쌍 촬영, 약 40초</span></li>
+    <li><b>밀봉 · 검사</b><span>Ti 밴드 결합, 10 bar 리크, 인증 E2E 테스트</span></li>
+  </ol>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>모듈</th><th>사양</th><th style="text-align:right">개당 (원)</th></tr></thead>
+      <tbody>
+        <tr><td>사파이어 2층 모놀리스</td><td>Ø38, 연마 · 접합</td><td class="n">22,000</td></tr>
+        <tr><td>무작위 펨토초 각인</td><td>약 2만 점, 40초</td><td class="n">3,500</td></tr>
+        <tr><td>LED 링 · 렌즈</td><td>마이크로 LED 120, 원통형 마이크로렌즈 링, 드라이버</td><td class="n">8,500</td></tr>
+        <tr><td>보안칩</td><td>EAL6+ 등급 보안 요소</td><td class="n">1,800</td></tr>
+        <tr><td>전자 · 전원</td><td>BLE MCU, AT컷 수정, 온도·가속도·조도, 100 mAh 셀, 무선충전</td><td class="n">10,000</td></tr>
+        <tr><td>케이스 · 스트랩</td><td>Ti G5 밴드, 흑색 지르코니아 백, FKM 스트랩</td><td class="n">23,500</td></tr>
+        <tr><td>지문 등록 · 서버</td><td>등록 장비 상각, 10년 서버 운영 적립</td><td class="n">4,000</td></tr>
+        <tr><td>조립 · 검사 · 수율손실</td><td>수율 93% 가정</td><td class="n">8,000</td></tr>
+        <tr><td>패키지</td><td>-</td><td class="n">4,000</td></tr>
+      </tbody>
+      <tfoot><tr><td>합계</td><td>목표 판매가 2,390,000원</td><td class="n">85,300</td></tr></tfoot>
+    </table>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">08 · 실물 검증 계획</div>
+    <h2>시뮬레이션이 끝난 곳에서 시편이 시작된다</h2>
+    <p>각 단계는 통과 기준을 못 넘으면 다음으로 가지 않습니다. 기간과 비용은 개략 추정입니다.</p>
+  </header>
+  <div class="gate">
+    <div class="card"><div class="when">GATE 0 · 4주</div><h3>특허 · FTO</h3><p>변리사 선행기술·침해 조사, 핵심 출원.</p><div class="pass">통과: 침해 위험 낮음 + 출원 완료</div></div>
+    <div class="card"><div class="when">GATE 1 · 10주</div><h3>광학 시편 20장</h3><p>사파이어 각인 시편으로 산란율·빔 폭·휘도·층간 누광 실측.</p><div class="pass">통과: 휘도 ≥ 1,500 cd/m², 직사광 대비 ≥ 3:1</div></div>
+    <div class="card"><div class="when">GATE 2 · 12주</div><h3>지문 시편 200장 + 레드팀</h3><p>폰 3기종 재측정, 개체 간 구별, 외부 업체에 L4·L5 복제 의뢰.</p><div class="pass">통과: 진품 거부율 ≤ 1%, 다른 개체 오인 0, L4 복제 실패</div></div>
+    <div class="card"><div class="when">GATE 3 · 16주</div><h3>시제품 50개</h3><p>방수·낙하·전력·온도, 인증 앱 전체 흐름.</p><div class="pass">통과: 10 bar, 1.5 m 낙하 후 인증 정상, 전력 ≥ 60일</div></div>
+    <div class="card"><div class="when">GATE 4</div><h3>양산 준비 1,000개</h3><p>각인·등록 공정 사이클타임과 수율 확인.</p><div class="pass">통과: 수율 ≥ 90%, 등록 ≤ 60초/개</div></div>
+  </div>
+</section>
+
+<footer>SIGNUM · 최종 모델 기획·검증 문서 · 계산과 시뮬레이션은 <code>signum/verify/</code>의 스크립트로 재현 가능하며, 단순화된 물리 모델에 기반하므로 시편 실측으로 확정해야 합니다.</footer>
+</div>
+
+<script>
+(function(){
+  // ---------- seeded RNG ----------
+  function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  function gauss(r){let u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  const PLANES=60, VOX=220, VOXH=120, R_OUT=18.5, R_IN=3, R_H=11;
+  function makeWatch(seed){const r=mulberry(seed*7919+13);const m=[],h=[];
+    for(let p=0;p<PLANES;p++){const a=[],b=[];
+      for(let i=0;i<VOX;i++)a.push({r:R_IN+(R_OUT-R_IN)*r(),lat:gauss(r)*0.015,b:Math.exp(gauss(r)*0.6)});
+      for(let i=0;i<VOXH;i++)b.push({r:R_IN+(R_H-R_IN)*r(),lat:gauss(r)*0.02,b:Math.exp(gauss(r)*0.6)});
+      m.push(a);h.push(b);}
+    return {m,h};}
+  const watches={1:makeWatch(1),2:makeWatch(2),3:makeWatch(3)};
+
+  // ---------- hero dial ----------
+  const cv=document.getElementById("dial"), ctx=cv.getContext("2d"), S=400/19.6;
+  let serial=1, fast=false, base=0, simBase=0, last=Date.now(), key="";
+  function drawDial(w,m,h){
+    ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,800,800);
+    const g=ctx.createRadialGradient(340,300,20,400,400,400);g.addColorStop(0,"#16202C");g.addColorStop(1,"#04060A");
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(400,400,398,0,7);ctx.fill();
+    ctx.translate(400,400);
+    // nebula (unlit voxels, faintly visible by ambient light)
+    for(let p=0;p<PLANES;p++){const th=p*Math.PI/30,s=Math.sin(th),c=Math.cos(th);
+      for(const v of w.m[p]){const x=(v.r*s+v.lat*c)*S,y=(-v.r*c+v.lat*s)*S;ctx.fillStyle=`rgba(170,195,220,${Math.min(.28,.05*v.b)})`;ctx.fillRect(x-.8,y-.8,1.6,1.6);}
+      for(const v of w.h[p]){const x=(v.r*s+v.lat*c)*S,y=(-v.r*c+v.lat*s)*S;ctx.fillStyle=`rgba(200,190,230,${Math.min(.22,.04*v.b)})`;ctx.fillRect(x-.7,y-.7,1.4,1.4);}}
+    // lit hands
+    function lit(arr,deg,col,sig0,gain){const th=deg*Math.PI/180,s=Math.sin(th),c=Math.cos(th);
+      ctx.shadowColor=col;ctx.shadowBlur=10;
+      for(const v of arr){const d=R_OUT-v.r,sig=(0.1+2*d*0.025)/2.355*sig0;const I=v.b*Math.exp(-0.5*(v.lat/sig)**2)*Math.exp(-0.03*d)*gain;
+        if(I<0.05)continue;const x=(v.r*s+v.lat*c)*S,y=(-v.r*c+v.lat*s)*S,rad=1+Math.min(3.2,I*1.4);
+        ctx.fillStyle=col;ctx.globalAlpha=Math.min(1,.35+I*.5);ctx.beginPath();ctx.arc(x,y,rad,0,7);ctx.fill();}
+      ctx.globalAlpha=1;ctx.shadowBlur=0;}
+    lit(w.m[m],m*6,"#8CF5C8",1,1);
+    for(const [dp,gain] of [[0,1],[1,.3],[59,.3]]){const p=(h+dp)%60;lit(w.h[p],h*6+(dp===1?6:dp===59?-6:0),"#FFF1DC",1.6,gain*1.1);}
+    // hub
+    ctx.fillStyle="#020304";ctx.strokeStyle="#2C323C";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,2.6*S,0,7);ctx.fill();ctx.stroke();
+    // engraved serial
+    ctx.fillStyle="rgba(170,180,195,.35)";ctx.font="11px JetBrains Mono, monospace";ctx.textAlign="center";ctx.fillText("No. "+String(serial).padStart(4,"0"),0,9*S);
+  }
+  const ro=document.getElementById("readout"), bFast=document.getElementById("bFast");
+  bFast.onclick=()=>{fast=!fast;if(fast){base=Date.now();simBase=last;}bFast.setAttribute("aria-pressed",fast);};
+  document.querySelectorAll("[data-serial]").forEach(b=>b.onclick=()=>{serial=+b.dataset.serial;key="";document.querySelectorAll("[data-serial]").forEach(x=>x.setAttribute("aria-pressed",x===b));});
+  function tick(){const real=Date.now();last=fast?simBase+(real-base)*300:real;const d=new Date(last),m=d.getMinutes(),h=((d.getHours()%12)*5+Math.floor(m/12))%60;
+    const k=serial+":"+m+":"+h;if(k!==key){drawDial(watches[serial],m,h);key=k;}
+    const p=n=>String(n).padStart(2,"0");ro.textContent=p(d.getHours())+":"+p(m)+":"+p(d.getSeconds());requestAnimationFrame(tick);}
+  tick();
+
+  // ---------- verification simulator (simplified puf_sim.py) ----------
+  const vr=mulberry(424242);
+  const RS=[];for(let x=R_IN+0.5;x<R_OUT-0.3;x+=0.08)RS.push(x);
+  const genuine=watches[1];
+  function cloneOf(w,posErr,brErr){return {m:w.m.map(a=>a.map(v=>({r:v.r+gauss(vr)*posErr/1000,lat:v.lat+gauss(vr)*posErr/1000,b:brErr===null?Math.exp(gauss(vr)*0.6):v.b*Math.exp(gauss(vr)*brErr)})))};}
+  function profile(w,p,a,noise){const out=new Float64Array(RS.length);const dr=gauss(vr)*0.012*(noise>0.02?1:0),dl=gauss(vr)*0.012*(noise>0.02?1:0);
+    for(const v of w.m[p]){const d=R_OUT-v.r,sig=(0.1+2*d*0.025)/2.355,I=a*v.b*Math.exp(-0.5*((v.lat+dl)/sig)**2)*Math.exp(-0.03*d);
+      const lo=Math.max(0,Math.floor((v.r+dr-0.2-RS[0])/0.08)),hi=Math.min(RS.length-1,Math.ceil((v.r+dr+0.2-RS[0])/0.08));
+      for(let i=lo;i<=hi;i++)out[i]+=I*Math.exp(-0.5*((RS[i]-v.r-dr)/0.05)**2);}
+    let mean=0;for(const x of out)mean+=x;mean/=out.length;
+    for(let i=0;i<out.length;i++)out[i]=out[i]*(1+gauss(vr)*noise)+gauss(vr)*noise*mean;return out;}
+  function bitsOf(pr){const k=9,res=[];for(let i=0;i<pr.length;i++){let s=0;for(let j=-4;j<=4;j++)s+=pr[Math.min(pr.length-1,Math.max(0,i+j))];res.push(pr[i]>s/k);}return res;}
+  const vdial=document.getElementById("vdial"),vx=vdial.getContext("2d"),vprof=document.getElementById("vprof"),px=vprof.getContext("2d");
+  let mode="genuine";
+  function run(){
+    const leds=[];while(leds.length<12){const p=Math.floor(vr()*60);if(!leds.includes(p))leds.push(p);}
+    const amps=leds.map(()=>[0.4,0.7,1.0][Math.floor(vr()*3)]);
+    let target, se;
+    if(mode==="genuine"){target=genuine;se=true;}
+    else if(mode==="other"){target=makeWatch(1000+Math.floor(vr()*1e6));se=false;}
+    else if(mode==="transplant"){target=makeWatch(2000+Math.floor(vr()*1e6));se=true;}
+    else if(mode==="clone"){target=cloneOf(genuine,1,null);se=false;}
+    else {target=cloneOf(genuine,3,0.30);se=false;}
+    let diff=0,tot=0,firstRef,firstCap;
+    leds.forEach((p,i)=>{const ref=profile(genuine,p,amps[i],0.01),cap=profile(target,p,amps[i],0.04);
+      const a=bitsOf(ref),b=bitsOf(cap);for(let j=0;j<a.length;j++){tot++;if(a[j]!==b[j])diff++;}
+      if(i===0){firstRef=ref;firstCap=cap;}});
+    const hd=diff/tot, okO=hd<0.15;
+    // draw challenge dial
+    vx.setTransform(1,0,0,1,0,0);vx.fillStyle="#05070A";vx.fillRect(0,0,600,600);vx.translate(300,300);const s=290/19.6;
+    vx.strokeStyle="#22262E";vx.beginPath();vx.arc(0,0,288,0,7);vx.stroke();
+    leds.forEach((p,i)=>{const th=p*Math.PI/30,sn=Math.sin(th),cs=Math.cos(th);vx.fillStyle="#8CF5C8";vx.shadowColor="#8CF5C8";vx.shadowBlur=6;
+      for(const v of target.m[p]){const d=R_OUT-v.r,sig=(0.1+2*d*0.025)/2.355,I=amps[i]*v.b*Math.exp(-0.5*(v.lat/sig)**2)*Math.exp(-0.03*d);if(I<.06)continue;
+        vx.globalAlpha=Math.min(1,.25+I*.5);vx.beginPath();vx.arc((v.r*sn+v.lat*cs)*s,(-v.r*cs+v.lat*sn)*s,.8+Math.min(2.4,I),0,7);vx.fill();}
+      const [lx,ly]=[19.2*sn*s,-19.2*cs*s];vx.globalAlpha=1;vx.fillStyle=["#3C6B5A","#6FBFA0","#C8F04B"][[0.4,0.7,1.0].indexOf(amps[i])];vx.beginPath();vx.arc(lx,ly,4,0,7);vx.fill();});
+    vx.shadowBlur=0;vx.globalAlpha=1;
+    // draw profile
+    px.setTransform(1,0,0,1,0,0);px.clearRect(0,0,900,300);
+    const mx=Math.max(...firstRef,...firstCap)*1.05;
+    function line(arr,col){px.strokeStyle=col;px.lineWidth=2;px.beginPath();arr.forEach((v,i)=>{const x=20+i*(860/(arr.length-1)),y=280-v/mx*260;i?px.lineTo(x,y):px.moveTo(x,y);});px.stroke();}
+    px.strokeStyle="#22262E";px.beginPath();px.moveTo(20,280);px.lineTo(880,280);px.stroke();
+    line(firstRef,"#C8F04B");line(firstCap,"#F08A4B");
+    px.fillStyle="#8E95A3";px.font="16px JetBrains Mono, monospace";px.fillText("반경 "+R_IN.toFixed(0)+" mm",24,20);px.textAlign="right";px.fillText("18 mm",876,20);px.textAlign="left";
+    const rHD=document.getElementById("rHD"),rSE=document.getElementById("rSE"),rV=document.getElementById("rV"),rWhy=document.getElementById("rWhy");
+    rHD.textContent=(hd*100).toFixed(1)+"%";rHD.className="val "+(okO?"ok":"ng");
+    rSE.textContent=se?"일치":"불일치";rSE.className="val "+(se?"ok":"ng");
+    const pass=okO&&se;rV.textContent=pass?"진품":"위조";rV.className="val "+(pass?"ok":"ng");
+    rWhy.textContent=pass?"광학 지문 + 보안칩 모두 일치":(!okO&&!se?"광학 지문·보안칩 모두 불일치":!okO?"광학 지문 불일치":"광학은 통과, 보안칩에서 차단");
+  }
+  document.querySelectorAll("[data-case]").forEach(b=>b.onclick=()=>{mode=b.dataset.case;document.querySelectorAll("[data-case]").forEach(x=>x.setAttribute("aria-pressed",x===b));run();});
+  document.getElementById("vAgain").onclick=run;
+  run();
+})();
+</script>
+</body>
+</html>
