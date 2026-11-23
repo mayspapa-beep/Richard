@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLUX 시계</title>
+<meta name="description" content="바늘 대신 자성 액체가 흐르는 시계 — 평면 코일 기판과 3D 프린팅 티타늄 격자 케이스로 양산하는 미래형 프리미엄 시계 콘셉트">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans+KR:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#07080A;--bg2:#0E1014;--surface:#13161C;--line:#22262E;--line2:#343A45;
+  --ink:#ECEEF2;--muted:#8E95A3;--accent:#C8F04B;--accent2:#4BD3F0;--warn:#F08A4B;
+  --ti1:#9AA1AC;--ti2:#5B616B;--ti3:#2A2E35;--sap:rgba(30,40,55,.55);
+  --f-d:"Michroma","IBM Plex Sans KR",sans-serif;--f-b:"IBM Plex Sans KR",system-ui,sans-serif;--f-m:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+  --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+    --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);line-height:1.7;font-size:15px}
+.wrap{max-width:1120px;margin:0 auto;padding:48px 16px 80px}
+h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+p{margin:0}
+.k{font:500 11px var(--f-m);letter-spacing:.18em;color:var(--accent);text-transform:uppercase}
+.muted{color:var(--muted)}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero h1{font-family:var(--f-d);font-weight:400;font-size:clamp(34px,6vw,58px);letter-spacing:.08em;line-height:1.1;margin:14px 0 18px}
+.hero .lead{font-size:17px;color:var(--muted);max-width:32em}
+.stage{position:relative;aspect-ratio:1/1.18;max-width:520px;width:100%;margin:0 auto}
+.stage svg{width:100%;height:100%;display:block}
+.readout{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:22px}
+.time{font:500 28px var(--f-m);letter-spacing:.06em}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font:500 12px var(--f-m);letter-spacing:.08em;background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:999px;padding:8px 14px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:#0A0C08;border-color:var(--accent)}
+/* sections */
+section{padding-top:72px}
+section > header{margin-bottom:28px;max-width:46em}
+section > header h2{font-size:clamp(22px,3.2vw,30px);margin-top:10px}
+section > header p{color:var(--muted);margin-top:10px}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.g5{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0}
+.card h3{font-size:16px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:14px}
+.rule{display:flex;flex-direction:column;gap:10px}
+.rule .old{font:500 12px var(--f-m);color:var(--muted);text-decoration:line-through;text-decoration-color:var(--warn)}
+.rule .new{font-size:16px;font-weight:600}
+.num{font:400 30px var(--f-d);color:var(--accent);line-height:1}
+.req .tag{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--accent2)}
+.req .big{font:500 22px var(--f-m);margin:8px 0 6px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;overflow:hidden}
+.panel svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+td.n{font-family:var(--f-m);text-align:right;white-space:nowrap}
+tfoot td{font-weight:600;border-bottom:none}
+.tablewrap{overflow-x:auto}
+.flow{counter-reset:s;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.flow li{list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;font-size:14px}
+.flow li::before{counter-increment:s;content:"0" counter(s);display:block;font:500 12px var(--f-m);color:var(--accent);margin-bottom:6px}
+.flow li b{display:block;margin-bottom:4px}
+.flow li span{color:var(--muted)}
+.svgtext{font-family:var(--f-m);font-size:11px;fill:var(--muted)}
+.svglabel{font-family:var(--f-b);font-size:12px;fill:var(--ink)}
+footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.risk td:first-child{font-weight:600;white-space:nowrap}
+</style>
+<style>
+.nav{display:flex;gap:16px;flex-wrap:wrap;font:500 12px var(--f-m);letter-spacing:.08em;margin-bottom:40px}
+.nav a{color:var(--muted);text-decoration:none;border-bottom:1px solid transparent}
+.nav a[aria-current]{color:var(--ink);border-color:var(--accent)}
+td.win{color:var(--accent);font-weight:600}
+.verdict{margin-top:14px;font-size:15px}
+.verdict b{color:var(--accent)}
+.blob{transform-box:view-box;transform-origin:0 0}
+.spk{transform-box:view-box;transform-origin:0 0}
+.phase{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.phase .card svg{width:100%;height:auto;display:block;margin-bottom:12px;border-radius:6px;background:#EDEBE6}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="nav"><a href="../zero-axis/">01 ZERO-AXIS</a><a href="../linea/">02 LINEA</a><a href="../still/">03 STILL</a><a href="./" aria-current="page">04 FLUX</a><a href="../coda/">05 CODA</a><a href="../signum/">06 SIGNUM · 최종</a></nav>
+
+<div class="hero">
+  <div>
+    <div class="k">Concept 04 · Liquid-Hand Chronometer</div>
+    <h1>FLUX</h1>
+    <p class="lead">바늘이 <b>액체</b>입니다. 사파이어 캡슐 안에 갇힌 검은 자성 유체 방울이 흰 세라믹 위를 흘러가며 시간을 가리키고, 매분 정각이 되면 <b>가시처럼 솟아올랐다가</b> 다시 둥근 방울로 돌아갑니다. 케이스는 깎지 않고 <b>3D 프린터로 출력한</b> 티타늄 격자 구조입니다. 지금까지 나온 손목시계 중 어디에도 없는 생김새입니다.</p>
+    <div class="readout">
+      <div class="time" id="readout">--:--:--</div>
+      <div class="btns">
+        <button id="bLive" aria-pressed="true">실시간</button>
+        <button id="bFast" aria-pressed="false">빨리감기 ×120</button>
+        <button id="bBloom" aria-pressed="false">스파이크 보기</button>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13px;margin-top:10px">바깥 채널의 작은 방울 = 분 · 안쪽 채널의 큰 방울 = 시. 방울은 아래쪽 미세 자석에 붙어 전기 없이 제자리를 지키고, 움직일 때만 코일이 순간적으로 끌어당깁니다.</p>
+  </div>
+
+  <div class="stage">
+    <svg id="watch" viewBox="-240 -284 480 568" role="img" aria-label="FLUX 상면도">
+      <defs>
+        <linearGradient id="ti" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#C9CED6"/><stop offset=".5" stop-color="#5E646E"/><stop offset="1" stop-color="#A9AFB8"/>
+        </linearGradient>
+        <radialGradient id="dial" cx="40%" cy="35%" r="80%">
+          <stop offset="0" stop-color="#FBFAF7"/><stop offset=".7" stop-color="#ECEAE4"/><stop offset="1" stop-color="#D9D6CE"/>
+        </radialGradient>
+        <linearGradient id="strap" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#15171B"/><stop offset=".5" stop-color="#2A2D33"/><stop offset="1" stop-color="#15171B"/>
+        </linearGradient>
+        <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".3" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+        <pattern id="lattice" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+          <rect width="14" height="14" fill="#16181C"/>
+          <path d="M0 7 L7 0 L14 7 L7 14 Z" fill="none" stroke="#9AA1AC" stroke-width="2.4"/>
+        </pattern>
+        <filter id="goo" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b"/>
+          <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" result="g"/>
+          <feSpecularLighting in="g" surfaceScale="4" specularConstant=".9" specularExponent="22" lighting-color="#ffffff" result="spec">
+            <fePointLight x="-120" y="-220" z="160"/>
+          </feSpecularLighting>
+          <feComposite in="spec" in2="g" operator="in" result="specIn"/>
+          <feComposite in="g" in2="specIn" operator="arithmetic" k1="0" k2="1" k3=".55" k4="0"/>
+        </filter>
+      </defs>
+
+      <path d="M-86 -192 L-80 -284 L80 -284 L86 -192 Z" fill="url(#strap)"/>
+      <path d="M-86 192 L-80 284 L80 284 L86 192 Z" fill="url(#strap)"/>
+      <!-- printed lattice lugs -->
+      <path d="M-120 -140 Q-126 -196 -98 -210 L-60 -210 Q-56 -188 -40 -184 Z" fill="url(#lattice)" stroke="#9AA1AC" stroke-width="2"/>
+      <path d="M120 -140 Q126 -196 98 -210 L60 -210 Q56 -188 40 -184 Z" fill="url(#lattice)" stroke="#9AA1AC" stroke-width="2"/>
+      <path d="M-120 140 Q-126 196 -98 210 L-60 210 Q-56 188 -40 184 Z" fill="url(#lattice)" stroke="#9AA1AC" stroke-width="2"/>
+      <path d="M120 140 Q126 196 98 210 L60 210 Q56 188 40 184 Z" fill="url(#lattice)" stroke="#9AA1AC" stroke-width="2"/>
+      <!-- case: lattice band with solid skin rims -->
+      <circle r="215" fill="url(#ti)"/>
+      <circle r="209" fill="url(#lattice)"/>
+      <circle r="196" fill="url(#ti)"/>
+      <circle r="190" fill="#C9C6BE"/>
+      <!-- white zirconia dial -->
+      <circle r="187" fill="url(#dial)"/>
+      <!-- channels -->
+      <circle r="155" fill="none" stroke="#D2CEC5" stroke-width="34"/>
+      <circle r="155" fill="none" stroke="#E6E3DC" stroke-width="30"/>
+      <circle r="98" fill="none" stroke="#D2CEC5" stroke-width="44"/>
+      <circle r="98" fill="none" stroke="#E6E3DC" stroke-width="40"/>
+      <g id="ticks"></g>
+      <!-- liquid -->
+      <g filter="url(#goo)" fill="#0B0B0E">
+        <g id="minBlob"></g>
+        <g id="hrBlob"></g>
+      </g>
+      <g id="spikes" fill="#0B0B0E"></g>
+      <!-- centre: engraved logo, no axis -->
+      <text x="0" y="4" text-anchor="middle" font-family="Michroma" font-size="10" letter-spacing="4" fill="#A8A398">FLUX</text>
+      <circle r="187" fill="url(#glare)"/>
+    </svg>
+  </div>
+</div>
+
+<section>
+  <header>
+    <div class="k">01 · 파괴한 시계공장 원칙</div>
+    <h2>고체로 만든다는 것, 깎아서 만든다는 것까지 버렸다</h2>
+    <p>앞의 세 콘셉트는 바늘의 위치·형태·존재를 바꿨습니다. FLUX는 바늘의 <b>물질 상태</b>를 바꿉니다. 그리고 케이스를 깎아 만든다는 공장의 마지막 상식까지 뒤집습니다.</p>
+  </header>
+  <div class="grid g3">
+    <div class="card rule"><div class="num">01</div><div class="old">바늘은 단단한 금속이다</div><div class="new">바늘은 액체다</div><p>나노 자성 입자가 섞인 검은 유체(페로플루이드) 방울이 바늘. 스피커 부품으로 매년 대량 생산되는 소재입니다.</p></div>
+    <div class="card rule"><div class="num">02</div><div class="old">바늘의 모양은 고정이다</div><div class="new">바늘이 살아 움직인다</div><p>코일에 강한 펄스를 주면 표면이 가시처럼 솟는 ‘로젠스바이크 불안정’ 현상. 매분 정각, 바늘이 한 번 숨을 쉽니다.</p></div>
+    <div class="card rule"><div class="num">03</div><div class="old">바늘은 축과 기어가 민다</div><div class="new">자기장이 끌어당긴다</div><p>다이얼 아래 기판에 인쇄된 120개의 평면 코일이 차례로 켜지며 방울을 다음 칸으로 끌어당깁니다. 접촉도, 마찰도, 마모도 없습니다.</p></div>
+    <div class="card rule"><div class="num">04</div><div class="old">위치는 기어 맞물림이 기억한다</div><div class="new">위치는 코일이 ‘느낀다’</div><p>방울이 코일 위에 있으면 코일의 인덕턴스가 변합니다. 구동용 코일이 그대로 위치 센서가 되어 매시 방울의 위치를 확인합니다.</p></div>
+    <div class="card rule"><div class="num">05</div><div class="old">케이스는 덩어리를 깎아 만든다</div><div class="new">케이스는 출력한다</div><p>티타늄 분말 적층(3D 프린팅)으로 내부가 비어 있는 격자 구조를 한 번에 출력. 깎아서는 만들 수 없는 형상이며, 같은 크기 통짜 대비 약 35% 가볍습니다.</p></div>
+    <div class="card rule"><div class="num">06</div><div class="old">다이얼은 어둡고, 바늘은 밝다</div><div class="new">흰 세라믹 위의 검은 거울</div><p>흰 지르코니아 바탕 위를 검은 액체 거울이 흐릅니다. 빛을 내지 않고 반사로 읽히므로 한낮 햇빛 아래에서 가장 잘 보입니다.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">02 · 다섯 가지 조건 검증</div>
+    <h2>가장 파격적이지만, 소재와 공정은 이미 양산 중이다</h2>
+  </header>
+  <div class="grid g5">
+    <div class="card req"><div class="tag">① 제조 가능성</div><div class="big">기성 소재 3종</div><p>페로플루이드(스피커·씰링 산업), 다층 PCB 평면 코일(무선충전 산업), 티타늄 금속 3D 프린팅(항공·스마트워치 케이스 양산).</p></div>
+    <div class="card req"><div class="tag">② 정확도</div><div class="big">±1 s / 년</div><p>공유 플랫폼의 온도보상 AT컷 수정 + BLE/표준전파 동기. 방울 위치는 60개 자석 디텐트에 고정되고 인덕턴스로 상시 검증.</p></div>
+    <div class="card req"><div class="tag">③ 파격</div><div class="big">액체 바늘</div><p>손목시계 최초의 액체 표시. 정시마다 가시가 솟는 ‘살아 있는’ 바늘. 출력된 격자 케이스.</p></div>
+    <div class="card req"><div class="tag">④ 프리미엄</div><div class="big">Ti 격자 · 사파이어</div><p>3D 프린팅 Ti-6Al-4V 격자 케이스, 사파이어 캡슐, 흰 지르코니아 다이얼. 오브제로서의 존재감.</p></div>
+    <div class="card req"><div class="tag">⑤ 대량 양산</div><div class="big">연 10만 개</div><p>캡슐 충전·밀봉은 액정(LCD) 셀 충전 공정과 같은 진공 주입 방식. 코일은 PCB 공정이라 추가 부품 없이 인쇄됩니다.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">03 · 액체 바늘이 움직이는 방법</div>
+    <h2>붙잡고, 끌고, 숨쉰다</h2>
+  </header>
+  <div class="phase">
+    <div class="card">
+      <svg viewBox="0 0 300 120"><g filter="url(#goo2)" fill="#0B0B0E"><circle cx="150" cy="60" r="18"/></g>
+        <g fill="#C8F04B"><rect x="135" y="98" width="30" height="6" rx="3"/></g>
+        <g stroke="#9AA1AC" fill="none"><rect x="40" y="96" width="30" height="10" rx="3"/><rect x="230" y="96" width="30" height="10" rx="3"/></g>
+      </svg>
+      <h3>1. 붙잡기 — 전력 0</h3><p>각 칸 아래의 지름 0.8 mm 미세 자석이 방울을 붙잡습니다. 흔들어도, 뒤집어도 제자리. 대기 중에는 전기를 쓰지 않습니다.</p>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 300 120"><g filter="url(#goo2)" fill="#0B0B0E"><circle cx="130" cy="60" r="16"/><circle cx="152" cy="60" r="12"/><circle cx="170" cy="60" r="10"/><circle cx="186" cy="60" r="9"/></g>
+        <g stroke="#9AA1AC" fill="none"><rect x="105" y="96" width="30" height="10" rx="3"/></g>
+        <g fill="#4BD3F0"><rect x="175" y="96" width="30" height="10" rx="3"/></g>
+        <path d="M200 40 l18 0 m-6 -6 l6 6 l-6 6" stroke="#4BD3F0" stroke-width="2" fill="none"/>
+      </svg>
+      <h3>2. 끌기 — 8 ms 펄스</h3><p>다음 칸 코일이 디텐트 자석보다 강한 자기장을 순간적으로 만들어 방울을 늘여 끌어당깁니다. 방울은 표면장력으로 다시 둥글게 모입니다.</p>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 300 120"><g filter="url(#goo2)" fill="#0B0B0E"><circle cx="150" cy="66" r="18"/>
+        <path d="M150 18 L144 58 L156 58 Z"/><path d="M122 28 L132 60 L140 54 Z"/><path d="M178 28 L160 54 L168 60 Z"/><path d="M104 46 L128 66 L132 58 Z"/><path d="M196 46 L168 58 L172 66 Z"/></g>
+        <g fill="#F08A4B"><rect x="135" y="98" width="30" height="6" rx="3"/></g>
+      </svg>
+      <h3>3. 숨쉬기 — 매분 정각</h3><p>수직 방향 강한 펄스로 방울 표면에 가시가 솟았다가 0.8초 뒤 가라앉습니다. ‘시간이 지나갔다’는 것을 눈으로 보여주는 순간.</p>
+    </div>
+  </div>
+  <svg width="0" height="0" style="position:absolute"><defs><filter id="goo2"><feGaussianBlur stdDeviation="4"/><feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 20 -8"/></filter></defs></svg>
+</section>
+
+<section>
+  <header>
+    <div class="k">04 · 단면 구조</div>
+    <h2>액정 셀처럼 만든 캡슐, 무선충전기처럼 만든 코일</h2>
+    <p>Ø43 · 두께 10.8 mm. 캡슐은 사파이어 상판과 흰 지르코니아 하판 사이에 채널 두 개를 만들고, 투명 운반액과 자성 유체 방울을 진공 주입한 뒤 밀봉합니다. 운반액이 유리면과 자성 유체 사이에 얇은 막을 만들어 얼룩이 남지 않게 합니다.</p>
+  </header>
+  <div class="panel">
+    <svg viewBox="0 0 900 340" role="img" aria-label="FLUX 단면도">
+      <defs>
+        <pattern id="latt2" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#1B1E23"/><path d="M0 6 L6 0 L12 6 L6 12 Z" fill="none" stroke="#9AA1AC" stroke-width="1.6"/></pattern>
+      </defs>
+      <g transform="translate(63,40)">
+        <!-- printed lattice case U-walls -->
+        <path d="M0 0 L22 0 L22 170 L752 170 L752 0 L774 0 L774 178 Q774 196 756 196 L18 196 Q0 196 0 178 Z" fill="url(#latt2)" stroke="#9AA1AC"/>
+        <!-- sapphire top -->
+        <rect x="22" y="0" width="730" height="16" rx="3" fill="#4BD3F0" fill-opacity=".3" stroke="#4BD3F0"/>
+        <!-- capsule cavity: carrier fluid -->
+        <rect x="40" y="16" width="694" height="26" fill="#9FE6F5" fill-opacity=".18" stroke="#4BD3F0" stroke-opacity=".4"/>
+        <!-- channel walls -->
+        <g fill="#E6E3DC"><rect x="22" y="16" width="18" height="26"/><rect x="734" y="16" width="18" height="26"/><rect x="160" y="16" width="40" height="26"/><rect x="574" y="16" width="40" height="26"/><rect x="290" y="16" width="194" height="26"/></g>
+        <!-- ferrofluid blobs -->
+        <ellipse cx="100" cy="34" rx="34" ry="8" fill="#0B0B0E"/>
+        <ellipse cx="245" cy="33" rx="40" ry="9" fill="#0B0B0E"/>
+        <!-- white zirconia bottom -->
+        <rect x="22" y="42" width="730" height="10" fill="#F4F2ED" stroke="#C9C6BE"/>
+        <!-- coil PCB -->
+        <rect x="30" y="56" width="714" height="14" fill="#2BB673"/>
+        <g fill="none" stroke="#0E2A1C" stroke-width="1.4">
+          <rect x="60" y="58" width="30" height="10" rx="2"/><rect x="100" y="58" width="30" height="10" rx="2"/><rect x="220" y="58" width="30" height="10" rx="2"/><rect x="260" y="58" width="30" height="10" rx="2"/>
+          <rect x="644" y="58" width="30" height="10" rx="2"/><rect x="684" y="58" width="30" height="10" rx="2"/><rect x="484" y="58" width="30" height="10" rx="2"/><rect x="524" y="58" width="30" height="10" rx="2"/>
+        </g>
+        <!-- detent magnets -->
+        <g fill="#E0457B"><rect x="94" y="74" width="12" height="10"/><rect x="134" y="74" width="12" height="10"/><rect x="54" y="74" width="12" height="10"/><rect x="238" y="74" width="12" height="10"/><rect x="278" y="74" width="12" height="10"/><rect x="198" y="74" width="12" height="10"/>
+        <rect x="524" y="74" width="12" height="10"/><rect x="564" y="74" width="12" height="10"/><rect x="668" y="74" width="12" height="10"/><rect x="708" y="74" width="12" height="10"/></g>
+        <!-- driver + battery -->
+        <rect x="40" y="92" width="694" height="10" fill="#2BB673" fill-opacity=".5"/>
+        <rect x="120" y="108" width="534" height="40" rx="6" fill="#8E95A3" fill-opacity=".5" stroke="#8E95A3"/>
+        <path d="M250 160 Q387 168 524 160" stroke="#F08A4B" stroke-width="3" fill="none"/>
+      </g>
+      <g font-family="IBM Plex Sans KR, sans-serif" font-size="12.5">
+        <text x="63" y="270" fill="#4BD3F0">■ 사파이어 상판 · 투명 운반액 (진공 주입)</text>
+        <text x="63" y="292" fill="var(--ink)">● 자성 유체 방울: 분 ~6 μL · 시 ~10 μL</text>
+        <text x="63" y="314" fill="#C9C6BE">■ 흰 지르코니아 하판 0.3 mm (비자성)</text>
+        <text x="460" y="270" fill="#2BB673">■ 4층 PCB 평면 코일 60 + 60 · 드라이버 · MCU</text>
+        <text x="460" y="292" fill="#E0457B">■ 디텐트 미세 자석 Ø0.8 × 120</text>
+        <text x="460" y="314" fill="#8E95A3">■ Li-ion 셀 · <tspan fill="#F08A4B">무선 충전 코일</tspan> · <tspan fill="#9AA1AC">3D 프린팅 Ti 격자</tspan></text>
+      </g>
+      <text x="450" y="24" text-anchor="middle" class="svgtext">Ø43 · 두께 10.8 mm · 왼쪽 단면만 채널 표시(바깥 = 분, 안쪽 = 시)</text>
+    </svg>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">05 · 정확도와 전원</div>
+    <h2>방울은 틀릴 수 있다. 그래서 스스로 확인한다</h2>
+  </header>
+  <div class="grid g3">
+    <div class="card"><h3>시간 기준</h3><p>네 콘셉트 공통 플랫폼: 8.4 MHz AT컷 수정 + 디지털 온도보상, 단독 연 ±1초. 하루 1회 BLE·표준전파 동기 시 &lt; 0.05초.</p></div>
+    <div class="card"><h3>위치 확인</h3><p>매시 정각, 120개 코일의 인덕턴스를 0.3초 동안 스캔해 방울이 어디 있는지 측정. 예상 위치와 다르면 즉시 다시 끌어옵니다.</p></div>
+    <div class="card"><h3>방울 복구</h3><p>강한 충격으로 방울이 둘로 갈라지면, 코일을 한쪽 방향으로 연속 구동해 흩어진 방울을 한 칸으로 쓸어 모읍니다(약 4초).</p></div>
+    <div class="card"><h3>외부 자석</h3><p>스마트폰 커버·가방 자석 근처에서 방울이 끌려갈 수 있음. 디텐트 자석이 1차 방어, 위치 확인이 2차 복구. 자기 내성은 시제품에서 측정해 등급 표기.</p></div>
+    <div class="card"><h3>전원</h3><p>대기 전력은 사실상 0(자석이 붙잡음). 이동은 1스텝 약 1.5 mJ, 하루 약 1,560스텝 → 하루 약 0.2 mAh. 60 mAh 셀로 약 6개월(설계 목표, 실측 필요). 무선 충전.</p></div>
+    <div class="card"><h3>온도</h3><p>저온에서 유체 점도가 높아져 느려짐. 온도센서로 펄스 길이를 자동 보정, 작동 범위 −10 ~ +50 °C 목표.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">06 · 양산 공정</div>
+    <h2>시계 라인이 아니라 디스플레이 라인</h2>
+  </header>
+  <ol class="flow" style="padding:0;margin:0">
+    <li><b>케이스 출력</b><span>Ti-6Al-4V 분말 적층, 판당 수백 개 동시 출력 → 열처리 → 시트면만 CNC 마감</span></li>
+    <li><b>코일 기판</b><span>4층 PCB에 평면 코일 120개 인쇄, 디텐트 자석 자동 실장</span></li>
+    <li><b>캡슐 성형</b><span>지르코니아 하판에 채널 벽 성형, 사파이어 상판과 정렬</span></li>
+    <li><b>진공 주입</b><span>LCD 셀 공정처럼 진공 상태에서 운반액 충전, 방울 정량 토출(μL 디스펜서)</span></li>
+    <li><b>밀봉</b><span>레이저 유리 프릿 밀봉, 열팽창 흡수용 미세 기포실 포함</span></li>
+    <li><b>모듈 결합</b><span>캡슐 + 코일 기판 + 배터리를 케이스에 위에서 적층</span></li>
+    <li><b>자동 검사</b><span>카메라로 120칸 이동 전수 검사, 인덕턴스 보정표 기록, 10 bar 리크 테스트</span></li>
+  </ol>
+</section>
+
+<section>
+  <header>
+    <div class="k">07 · 원가 구조 (연 10만 개 기준 추정)</div>
+    <h2>원가 약 8.6만 원, 판매가 199만 원대</h2>
+    <p>공개 시세 기반 개략 추정이며 공급사 RFQ로 확정해야 합니다. 3D 프린팅 케이스와 캡슐 충전 공정이 원가의 핵심 변수입니다.</p>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>모듈</th><th>사양</th><th style="text-align:right">개당 (원)</th></tr></thead>
+      <tbody>
+        <tr><td>격자 케이스</td><td>Ti-6Al-4V 금속 3D 프린팅 + 시트면 CNC + 연마</td><td class="n">26,000</td></tr>
+        <tr><td>유체 캡슐</td><td>사파이어 상판 + 지르코니아 하판, 진공 주입, 프릿 밀봉</td><td class="n">18,000</td></tr>
+        <tr><td>자성 유체 · 운반액</td><td>약 16 μL + 운반액</td><td class="n">500</td></tr>
+        <tr><td>코일 기판</td><td>4층 PCB 평면 코일 120 + 코일 드라이버</td><td class="n">6,000</td></tr>
+        <tr><td>디텐트 자석</td><td>NdFeB Ø0.8 × 120</td><td class="n">3,000</td></tr>
+        <tr><td>전자</td><td>BLE MCU, AT컷 수정, 온도센서, 인덕턴스 측정</td><td class="n">7,000</td></tr>
+        <tr><td>전원</td><td>Li-ion 셀 + 무선 충전 코일</td><td class="n">3,000</td></tr>
+        <tr><td>스트랩</td><td>FKM 러버, 출력 티타늄 버클</td><td class="n">8,000</td></tr>
+        <tr><td>조립 · 검사 · 수율손실</td><td>충전·밀봉 공정 포함, 수율 92% 가정</td><td class="n">10,000</td></tr>
+        <tr><td>패키지</td><td>-</td><td class="n">4,000</td></tr>
+      </tbody>
+      <tfoot><tr><td>합계</td><td>목표 판매가 1,990,000원</td><td class="n">85,500</td></tr></tfoot>
+    </table>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">08 · 기술 리스크와 대응</div>
+    <h2>가장 파격적인 만큼, 가장 먼저 증명해야 할 것들</h2>
+  </header>
+  <div class="panel tablewrap">
+    <table class="risk">
+      <thead><tr><th>리스크</th><th>내용</th><th>대응</th></tr></thead>
+      <tbody>
+        <tr><td>유리 얼룩</td><td>자성 유체가 사파이어·세라믹 면에 달라붙어 자국을 남김 — 최우선 검증 항목</td><td>섞이지 않는 투명 운반액 + 소유성 표면 코팅. 페로플루이드 디스플레이 작품에서 쓰인 방식을 손목 크기로 축소 검증.</td></tr>
+        <tr><td>충격 · 분리</td><td>낙하 시 방울이 갈라지거나 디텐트에서 이탈</td><td>디텐트 자석 고정력 설계 + 인덕턴스 위치 확인 + 쓸어 모으기 복구 루틴.</td></tr>
+        <tr><td>외부 자기장</td><td>강한 자석 근처에서 방울이 이동</td><td>자동 복구, 자기 내성 시험 후 등급 표기. 기계식 시계의 ‘자기 내성’ 규격과 같은 방식으로 소비자 안내.</td></tr>
+        <tr><td>액체 밀봉 · 열팽창</td><td>온도 변화로 내부 압력 변화, 누설 위험</td><td>유리 프릿 기밀 밀봉 + 팽창 흡수 기포실, 열 사이클 1,000회 시험.</td></tr>
+        <tr><td>장기 안정성</td><td>수년간 유체 입자 응집·증발</td><td>계면활성제 안정화 유체 선정, 가속 수명 시험(85 °C/85%)으로 5년 등가 검증.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">09 · 네 콘셉트 비교</div>
+    <h2>ZERO-AXIS · LINEA · STILL · FLUX</h2>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>항목</th><th>01 ZERO-AXIS</th><th>02 LINEA</th><th>03 STILL</th><th>04 FLUX</th></tr></thead>
+      <tbody>
+        <tr><td>바꾼 것</td><td>바늘의 위치</td><td>바늘의 궤적</td><td>바늘의 존재</td><td class="win">바늘의 물질</td></tr>
+        <tr><td>표시</td><td>회전 링</td><td>리니어 셔틀</td><td>빛의 바늘</td><td>액체 방울</td></tr>
+        <tr><td>파격도</td><td>높음</td><td>중간</td><td>높음</td><td class="win">최고</td></tr>
+        <tr><td>항상 보이는가</td><td class="win">예</td><td class="win">예</td><td>아니오</td><td class="win">예 (무전원 유지)</td></tr>
+        <tr><td>햇빛 가독성</td><td>좋음</td><td>좋음</td><td>약함</td><td class="win">최고 (흰 바탕·검은 바늘)</td></tr>
+        <tr><td>제조 난이도</td><td>높음</td><td class="win">중간</td><td>중간</td><td>높음 (충전·밀봉)</td></tr>
+        <tr><td>배터리 (목표)</td><td class="win">8개월</td><td>3개월</td><td>2개월</td><td>6개월</td></tr>
+        <tr><td>원가 / 판매가</td><td>9.2만 / 179만</td><td class="win">7.05만 / 129만</td><td>7.6만 / 149만</td><td>8.55만 / 199만</td></tr>
+        <tr><td>최대 리스크</td><td>관통부 방수</td><td>전력 · 스크루</td><td>햇빛 가독성</td><td>유리 얼룩 · 장기 안정성</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="verdict">FLUX는 넷 중 가장 파격적이고, 의외로 <b>가독성·전력에서도 강합니다</b>(무전원 유지, 반사형 표시). 대신 액체 캡슐의 장기 신뢰성이 검증되지 않았으므로 <b>6개월 캡슐 단독 신뢰성 시험</b>을 먼저 돌리고, 통과하면 라인업의 최상위 <b>‘아이콘’ 모델</b>로 두는 것을 권합니다.</p>
+</section>
+
+<footer>FLUX · 콘셉트 디자인 문서 · 수치(원가·정확도·전원)는 공개 부품 사양 기반 설계 목표치이며 시제품 검증이 필요합니다.</footer>
+</div>
+
+<script>
+(function(){
+  const NS="http://www.w3.org/2000/svg";
+  function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+  // ticks: 60 minute dots outside outer channel, 12 hour bars inside inner channel
+  const tk=document.getElementById("ticks");
+  for(let i=0;i<60;i++){const a=i*Math.PI/30,big=i%5===0,r=178;
+    tk.appendChild(el("circle",{cx:(r*Math.sin(a)).toFixed(1),cy:(-r*Math.cos(a)).toFixed(1),r:big?2.6:1.2,fill:big?"#5E5A52":"#A8A398"}));}
+  for(let i=0;i<12;i++){const a=i*Math.PI/6,r1=66,r2=i%3===0?52:58;
+    tk.appendChild(el("line",{x1:(r1*Math.sin(a)).toFixed(1),y1:(-r1*Math.cos(a)).toFixed(1),x2:(r2*Math.sin(a)).toFixed(1),y2:(-r2*Math.cos(a)).toFixed(1),stroke:"#5E5A52","stroke-width":i%3===0?3:1.6,"stroke-linecap":"round"}));}
+
+  // blob = 4 trailing circles + spikes
+  function makeBlob(g,R,sizes,spikeLen){
+    const sg=document.getElementById("spikes");
+    const parts=sizes.map((s,i)=>{const c=el("circle",{cx:0,cy:-R,r:s,class:"blob"});g.appendChild(c);return c;});
+    const sp=el("g",{class:"spk"});sg.appendChild(sp);
+    const spikes=[];
+    for(let k=-4;k<=4;k++){const p=el("path",{d:"M0 0 L-3.2 0 L0 -1 L3.2 0 Z"});sp.appendChild(p);spikes.push({p,k});}
+    return {R,parts,sp,spikes,spikeLen,deg:null};
+  }
+  const minB=makeBlob(document.getElementById("minBlob"),155,[15,12,9,6],30);
+  const hrB=makeBlob(document.getElementById("hrBlob"),98,[21,17,13,9],36);
+
+  function setSpikes(b,amt){
+    b.spikes.forEach(({p,k})=>{const ang=k*24*Math.PI/180;const L=amt*b.spikeLen*(1-Math.abs(k)*.12);
+      const base=b.parts[0].getAttribute("r")*0.55;
+      // spike drawn pointing outward from blob centre, in local blob frame (blob at 0,-R)
+      const sx=Math.sin(ang),cy=-Math.cos(ang);
+      const bx=base*sx, by=-b.R+base*cy, tx=(base+L)*sx, ty=-b.R+(base+L)*cy, nx=-cy*4.2, ny=sx*4.2;
+      p.setAttribute("d",`M${(bx+nx).toFixed(1)} ${(by+ny).toFixed(1)} L${tx.toFixed(1)} ${ty.toFixed(1)} L${(bx-nx).toFixed(1)} ${(by-ny).toFixed(1)} Z`);
+    });
+  }
+  function moveBlob(b,deg,instant){
+    if(b.deg!==null){ // unwrap so it always flows clockwise
+      while(deg<b.deg-180)deg+=360;
+      while(deg<b.deg)deg+=360;
+    }
+    b.parts.forEach((c,i)=>{
+      c.style.transition=instant?"none":`transform ${0.35+i*0.14}s cubic-bezier(.5,0,.2,1)`;
+      c.style.transform=`rotate(${deg}deg)`;
+    });
+    b.sp.style.transition=instant?"none":"transform .5s cubic-bezier(.5,0,.2,1)";
+    b.sp.style.transform=`rotate(${deg}deg)`;
+    b.deg=deg;
+  }
+  function bloom(b){
+    const t0=performance.now();
+    function f(now){const t=(now-t0)/900;if(t>=1){setSpikes(b,0);return;}
+      const amt=t<.25?t/.25:1-(t-.25)/.75; setSpikes(b,Math.max(0,amt*(0.85+0.15*Math.sin(now/40))));requestAnimationFrame(f);}
+    requestAnimationFrame(f);
+  }
+  setSpikes(minB,0);setSpikes(hrB,0);
+
+  const ro=document.getElementById("readout"), bLive=document.getElementById("bLive"), bFast=document.getElementById("bFast"), bBloom=document.getElementById("bBloom");
+  let fast=false, base=0, simBase=0, last=Date.now(), pm=null, ph=null;
+  bLive.onclick=()=>{fast=false;bLive.setAttribute("aria-pressed","true");bFast.setAttribute("aria-pressed","false");};
+  bFast.onclick=()=>{base=Date.now();simBase=last;fast=true;bLive.setAttribute("aria-pressed","false");bFast.setAttribute("aria-pressed","true");};
+  bBloom.onclick=()=>{bloom(minB);bloom(hrB);};
+  function tick(){
+    const real=Date.now();
+    last=fast?simBase+(real-base)*120:real;
+    const d=new Date(last), m=d.getMinutes(), s=d.getSeconds();
+    const h=((d.getHours()%12)*5+Math.floor(m/12));
+    if(m!==pm){moveBlob(minB,m*6,pm===null); if(pm!==null) setTimeout(()=>bloom(minB),550); pm=m;}
+    if(h!==ph){moveBlob(hrB,h*6,ph===null); ph=h;}
+    const p=n=>String(n).padStart(2,"0");
+    ro.textContent=p(d.getHours())+":"+p(m)+":"+p(s);
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+</body>
+</html>

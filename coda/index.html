@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CODA 시계</title>
+<meta name="description" content="하나의 밀봉된 타임 코어 위에 네 개의 페이스를 4분의 1 회전으로 바꿔 끼우는 플랫폼 시계 — ZERO-AXIS·LINEA·STILL·FLUX 시리즈의 종결 모델">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans+KR:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#07080A;--bg2:#0E1014;--surface:#13161C;--line:#22262E;--line2:#343A45;
+  --ink:#ECEEF2;--muted:#8E95A3;--accent:#C8F04B;--accent2:#4BD3F0;--warn:#F08A4B;
+  --ti1:#9AA1AC;--ti2:#5B616B;--ti3:#2A2E35;--sap:rgba(30,40,55,.55);
+  --f-d:"Michroma","IBM Plex Sans KR",sans-serif;--f-b:"IBM Plex Sans KR",system-ui,sans-serif;--f-m:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+  --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+    --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);line-height:1.7;font-size:15px}
+.wrap{max-width:1120px;margin:0 auto;padding:48px 16px 80px}
+h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+p{margin:0}
+.k{font:500 11px var(--f-m);letter-spacing:.18em;color:var(--accent);text-transform:uppercase}
+.muted{color:var(--muted)}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero h1{font-family:var(--f-d);font-weight:400;font-size:clamp(34px,6vw,58px);letter-spacing:.08em;line-height:1.1;margin:14px 0 18px}
+.hero .lead{font-size:17px;color:var(--muted);max-width:32em}
+.stage{position:relative;aspect-ratio:1/1.18;max-width:520px;width:100%;margin:0 auto}
+.stage svg{width:100%;height:100%;display:block}
+.readout{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:22px}
+.time{font:500 28px var(--f-m);letter-spacing:.06em}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font:500 12px var(--f-m);letter-spacing:.08em;background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:999px;padding:8px 14px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:#0A0C08;border-color:var(--accent)}
+/* sections */
+section{padding-top:72px}
+section > header{margin-bottom:28px;max-width:46em}
+section > header h2{font-size:clamp(22px,3.2vw,30px);margin-top:10px}
+section > header p{color:var(--muted);margin-top:10px}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.g5{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0}
+.card h3{font-size:16px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:14px}
+.rule{display:flex;flex-direction:column;gap:10px}
+.rule .old{font:500 12px var(--f-m);color:var(--muted);text-decoration:line-through;text-decoration-color:var(--warn)}
+.rule .new{font-size:16px;font-weight:600}
+.num{font:400 30px var(--f-d);color:var(--accent);line-height:1}
+.req .tag{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--accent2)}
+.req .big{font:500 22px var(--f-m);margin:8px 0 6px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;overflow:hidden}
+.panel svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+td.n{font-family:var(--f-m);text-align:right;white-space:nowrap}
+tfoot td{font-weight:600;border-bottom:none}
+.tablewrap{overflow-x:auto}
+.flow{counter-reset:s;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.flow li{list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;font-size:14px}
+.flow li::before{counter-increment:s;content:"0" counter(s);display:block;font:500 12px var(--f-m);color:var(--accent);margin-bottom:6px}
+.flow li b{display:block;margin-bottom:4px}
+.flow li span{color:var(--muted)}
+.svgtext{font-family:var(--f-m);font-size:11px;fill:var(--muted)}
+.svglabel{font-family:var(--f-b);font-size:12px;fill:var(--ink)}
+footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.risk td:first-child{font-weight:600;white-space:nowrap}
+</style>
+<style>
+.nav{display:flex;gap:16px;flex-wrap:wrap;font:500 12px var(--f-m);letter-spacing:.08em;margin-bottom:40px}
+.nav a{color:var(--muted);text-decoration:none;border-bottom:1px solid transparent}
+.nav a[aria-current]{color:var(--ink);border-color:var(--accent)}
+td.win{color:var(--accent);font-weight:600}
+.verdict{margin-top:14px;font-size:15px}
+.verdict b{color:var(--accent)}
+#faceWrap{transform-box:view-box;transform-origin:0 0;transition:transform .45s cubic-bezier(.6,0,.3,1),opacity .45s}
+#faceWrap.out{transform:rotate(-90deg) scale(.92);opacity:0}
+#faceWrap.in0{transform:rotate(90deg) scale(.92);opacity:0;transition:none}
+.facebtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.facebtns button{min-width:92px}
+.faces{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.faces .card .tag{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--accent2)}
+.faces .card h3{margin-top:6px;font-family:var(--f-d);font-weight:400;letter-spacing:.08em}
+.faces dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:12px 0 0;font-size:13px}
+.faces dt{color:var(--muted)}
+.faces dd{margin:0;font-family:var(--f-m)}
+.road{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.road .card .when{font:500 12px var(--f-m);color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="nav"><a href="../zero-axis/">01 ZERO-AXIS</a><a href="../linea/">02 LINEA</a><a href="../still/">03 STILL</a><a href="../flux/">04 FLUX</a><a href="./" aria-current="page">05 CODA</a><a href="../signum/">06 SIGNUM · 최종</a></nav>
+
+<div class="hero">
+  <div>
+    <div class="k">Concept 05 · Finale · Platform Chronometer</div>
+    <h1>CODA</h1>
+    <p class="lead">시계 공장의 마지막 원칙은 <b>“시계는 한 번 완성되면 그것으로 끝”</b>이라는 것입니다. CODA는 평생 열 필요가 없는 <b>밀봉된 타임 코어</b> 하나 위에, 지금까지의 네 콘셉트를 <b>4분의 1 회전으로 바꿔 끼우는 페이스</b>로 올립니다. 전기 접점도, 방수 개스킷도 없이. 하나의 심장, 네 개의 얼굴.</p>
+    <div class="facebtns" role="group" aria-label="페이스 선택">
+      <button data-face="zero" aria-pressed="false">ZERO-AXIS</button>
+      <button data-face="linea" aria-pressed="false">LINEA</button>
+      <button data-face="still" aria-pressed="false">STILL</button>
+      <button data-face="flux" aria-pressed="true">FLUX</button>
+    </div>
+    <div class="readout">
+      <div class="time" id="readout">--:--:--</div>
+      <div class="btns">
+        <button id="bLive" aria-pressed="true">실시간</button>
+        <button id="bFast" aria-pressed="false">빨리감기 ×300</button>
+        <button id="bAuto" aria-pressed="false">자동 교체</button>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13px;margin-top:10px">페이스 버튼을 누르면 실제 베이어넷 결합처럼 4분의 1 바퀴 돌아 빠지고, 새 페이스가 돌아 들어갑니다. 시간은 코어가 계속 지키므로 어떤 페이스를 끼워도 즉시 정확한 시각을 가리킵니다.</p>
+  </div>
+
+  <div class="stage">
+    <svg id="watch" viewBox="-240 -284 480 568" role="img" aria-label="CODA 상면도 — 선택한 페이스 표시">
+      <defs>
+        <linearGradient id="ti" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#D2D7DE"/><stop offset=".48" stop-color="#666C76"/><stop offset=".52" stop-color="#4A4F57"/><stop offset="1" stop-color="#AEB4BD"/>
+        </linearGradient>
+        <linearGradient id="strap" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#15171B"/><stop offset=".5" stop-color="#2A2D33"/><stop offset="1" stop-color="#15171B"/>
+        </linearGradient>
+        <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+        <radialGradient id="darkDial" cx="45%" cy="38%" r="75%"><stop offset="0" stop-color="#1A1F28"/><stop offset="1" stop-color="#07090C"/></radialGradient>
+        <radialGradient id="whiteDial" cx="40%" cy="35%" r="80%"><stop offset="0" stop-color="#FBFAF7"/><stop offset=".7" stop-color="#ECEAE4"/><stop offset="1" stop-color="#D9D6CE"/></radialGradient>
+        <radialGradient id="coreWin" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#21324A"/><stop offset="1" stop-color="#070B12"/></radialGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="goo" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/><feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 22 -9"/></filter>
+        <pattern id="screw" width="4" height="8" patternUnits="userSpaceOnUse" patternTransform="skewX(-30)"><rect width="4" height="8" fill="#2A2F37"/><rect width="1.6" height="8" fill="#59606B"/></pattern>
+        <clipPath id="faceClip"><circle r="186"/></clipPath>
+      </defs>
+      <path d="M-86 -192 L-80 -284 L80 -284 L86 -192 Z" fill="url(#strap)"/>
+      <path d="M-86 192 L-80 284 L80 284 L86 192 Z" fill="url(#strap)"/>
+      <path d="M-112 -146 Q-120 -198 -96 -212 L-62 -212 Q-58 -190 -40 -186 Z" fill="url(#ti)"/>
+      <path d="M112 -146 Q120 -198 96 -212 L62 -212 Q58 -190 40 -186 Z" fill="url(#ti)"/>
+      <path d="M-112 146 Q-120 198 -96 212 L-62 212 Q-58 190 -40 186 Z" fill="url(#ti)"/>
+      <path d="M112 146 Q120 198 96 212 L62 212 Q58 190 40 186 Z" fill="url(#ti)"/>
+      <!-- frame -->
+      <circle r="212" fill="url(#ti)"/>
+      <circle r="198" fill="#15171B"/>
+      <!-- bayonet lugs -->
+      <g fill="#8E95A3">
+        <rect x="-14" y="-199" width="28" height="7" rx="2"/><rect x="-14" y="192" width="28" height="7" rx="2"/>
+        <rect x="-199" y="-14" width="7" height="28" rx="2"/><rect x="192" y="-14" width="7" height="28" rx="2"/>
+      </g>
+      <!-- exposed time core (seen when face is swapped) -->
+      <circle r="190" fill="url(#coreWin)"/>
+      <g id="coreLabel" fill="#4BD3F0" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" opacity=".8">
+        <circle r="150" fill="none" stroke="#4BD3F0" stroke-opacity=".25" stroke-dasharray="2 6"/>
+        <circle r="60" fill="none" stroke="#4BD3F0" stroke-opacity=".35"/>
+        <text y="-6">TIME CORE</text><text y="12" font-size="9" fill="#8E95A3">SEALED · NO CONTACTS</text>
+      </g>
+      <!-- face module -->
+      <g id="faceWrap"><g clip-path="url(#faceClip)" id="face"></g><circle r="187" fill="none" stroke="#3A3F48" stroke-width="2"/></g>
+      <circle r="187" fill="url(#glare)" pointer-events="none"/>
+      <text x="0" y="208" text-anchor="middle" font-family="Michroma" font-size="7" letter-spacing="3" fill="#2A2E35">CODA</text>
+    </svg>
+  </div>
+</div>
+
+<section>
+  <header>
+    <div class="k">01 · 마지막으로 파괴한 원칙</div>
+    <h2>시계를 하나의 ‘제품’이 아니라 하나의 ‘플랫폼’으로</h2>
+    <p>앞의 네 모델은 바늘의 위치·궤적·존재·물질을 바꿨습니다. CODA는 바늘이 아니라 <b>시계라는 물건의 단위</b>를 바꿉니다. 시간을 지키는 부분과 시간을 보여주는 부분을 영구히 분리합니다.</p>
+  </header>
+  <div class="grid g3">
+    <div class="card rule"><div class="num">01</div><div class="old">시계는 완성된 하나의 물건이다</div><div class="new">심장과 얼굴을 분리한다</div><p>타임 코어(시간 기준·전원·통신)와 페이스(표시)를 독립 모듈로. 코어 하나에 페이스는 몇 개든.</p></div>
+    <div class="card rule"><div class="num">02</div><div class="old">모듈 사이에는 전기 접점이 있다</div><div class="new">접점 0 — 빛과 자기장으로 연결</div><p>전력은 6.78 MHz 무선 전력, 데이터는 근거리 자기 통신. 코어와 페이스 사이에 금속 단자가 하나도 없습니다.</p></div>
+    <div class="card rule"><div class="num">03</div><div class="old">방수는 개스킷과 뒷뚜껑이 지킨다</div><div class="new">모듈마다 각자 밀봉</div><p>코어도, 각 페이스도 공장에서 영구 밀봉. 둘을 합치는 결합부는 방수가 필요 없으니 사용자가 아무 데서나 바꿔 끼웁니다.</p></div>
+    <div class="card rule"><div class="num">04</div><div class="old">시계는 열어서 고친다</div><div class="new">코어는 평생 열지 않는다</div><p>전고체 배터리 + 무선 충전 + 펌웨어 업데이트. 20년 설계 수명, 열 수 있는 곳이 아예 없습니다.</p></div>
+    <div class="card rule"><div class="num">05</div><div class="old">다른 디자인 = 다른 무브먼트</div><div class="new">모든 디자인이 하나의 심장을 공유</div><p>회전 링·리니어 셔틀·빛·액체 — 전혀 다른 네 표시계가 같은 코어 위에서 돌아갑니다. 공장은 코어 한 종류만 대량 생산합니다.</p></div>
+    <div class="card rule"><div class="num">06</div><div class="old">시계는 한 번 사면 끝</div><div class="new">시계가 계속 자란다</div><p>새 페이스가 나올 때마다 같은 시계가 새 시계가 됩니다. 컬렉션은 시계 여러 개가 아니라 얼굴 여러 개.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">02 · 다섯 가지 조건 검증</div>
+    <h2>네 모델의 약점을 플랫폼이 메운다</h2>
+  </header>
+  <div class="grid g5">
+    <div class="card req"><div class="tag">① 제조 가능성</div><div class="big">코어 1종</div><p>가장 어려운 부분(시간 기준·전원·밀봉)을 단 하나의 부품으로 모아 집중 양산. 페이스는 표시계만 담아 단순해집니다.</p></div>
+    <div class="card req"><div class="tag">② 정확도</div><div class="big">±1 s/년 · 20년</div><p>온도보상 AT컷 수정 + BLE/표준전파 동기가 코어에 영구 탑재. 페이스를 끼우는 순간 코어가 페이스 위치 센서를 읽고 0.5초 안에 정시각으로 맞춥니다.</p></div>
+    <div class="card req"><div class="tag">③ 파격</div><div class="big">얼굴을 바꾸는 시계</div><p>공구 없이 3초 만에 완전히 다른 표시 원리의 시계로 변신. 전기 접점 0, 결합부 방수 불필요.</p></div>
+    <div class="card req"><div class="tag">④ 프리미엄</div><div class="big">평생 코어</div><p>3D 프린팅 Ti 프레임, 사파이어·세라믹 코어, 20년 보증. 페이스는 한정판·협업 에디션으로 확장.</p></div>
+    <div class="card req"><div class="tag">⑤ 대량 양산</div><div class="big">코어 연 40만 개</div><p>네 페이스 판매량이 전부 하나의 코어 수요로 합쳐져 규모의 경제. 코어 사이클타임 30초/개.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">03 · 구조</div>
+    <h2>세 개의 층, 접점은 없다</h2>
+    <p>프레임(케이스+스트랩) 안에 코어가 영구 고정되고, 페이스는 위에서 내려놓아 4분의 1 바퀴 돌리면 잠깁니다. 전력과 신호는 사파이어를 통과하는 자기장으로 전달됩니다.</p>
+  </header>
+  <div class="panel">
+    <svg viewBox="0 0 900 420" role="img" aria-label="CODA 분해 구조도">
+      <defs>
+        <pattern id="latt" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#1B1E23"/><path d="M0 6 L6 0 L12 6 L6 12 Z" fill="none" stroke="#9AA1AC" stroke-width="1.5"/></pattern>
+      </defs>
+      <g transform="translate(70,0)">
+        <!-- FACE module -->
+        <g transform="translate(0,40)">
+          <rect x="40" y="0" width="420" height="56" rx="10" fill="#4BD3F0" fill-opacity=".12" stroke="#4BD3F0"/>
+          <rect x="52" y="10" width="396" height="18" rx="4" fill="#E6E3DC" fill-opacity=".85"/>
+          <rect x="60" y="34" width="380" height="8" fill="#F08A4B" fill-opacity=".8"/>
+          <rect x="80" y="44" width="340" height="6" fill="#2BB673"/>
+          <rect x="30" y="20" width="10" height="16" fill="#8E95A3"/><rect x="460" y="20" width="10" height="16" fill="#8E95A3"/>
+          <text x="250" y="-10" text-anchor="middle" class="svglabel">페이스 모듈 (영구 밀봉) — 표시계 · 구동부 · 수전 코일</text>
+        </g>
+        <!-- arrow quarter turn -->
+        <path d="M480 120 a26 12 0 1 1 -10 -18" fill="none" stroke="var(--accent)" stroke-width="2"/>
+        <path d="M466 98 l6 6 l-8 2" fill="none" stroke="var(--accent)" stroke-width="2"/>
+        <text x="470" y="148" text-anchor="middle" class="svgtext" style="fill:var(--accent)">¼ 회전 베이어넷</text>
+        <!-- wireless link -->
+        <g stroke="#C8F04B" stroke-width="1.5" fill="none" opacity=".9">
+          <path d="M150 112 q8 10 0 20 q-8 10 0 20"/><path d="M250 112 q8 10 0 20 q-8 10 0 20"/><path d="M350 112 q8 10 0 20 q-8 10 0 20"/>
+        </g>
+        <text x="250" y="174" text-anchor="middle" class="svgtext">6.78 MHz 무선 전력 + 근거리 자기 통신 · 사파이어 관통 · 금속 접점 0</text>
+        <!-- CORE -->
+        <g transform="translate(0,196)">
+          <rect x="60" y="0" width="380" height="64" rx="12" fill="#21324A" stroke="#4BD3F0"/>
+          <rect x="72" y="8" width="356" height="8" rx="3" fill="#C8F04B" fill-opacity=".7"/>
+          <rect x="84" y="22" width="332" height="10" fill="#2BB673"/>
+          <rect x="100" y="38" width="300" height="18" rx="5" fill="#8E95A3" fill-opacity=".6"/>
+          <text x="250" y="86" text-anchor="middle" class="svglabel">타임 코어 (영구 밀봉, 평생 비개방)</text>
+        </g>
+        <!-- FRAME -->
+        <g transform="translate(0,300)">
+          <path d="M20 0 L40 0 L40 70 L460 70 L460 0 L480 0 L480 80 Q480 96 464 96 L36 96 Q20 96 20 80 Z" fill="url(#latt)" stroke="#9AA1AC"/>
+          <path d="M-40 60 L20 72 L20 88 L-40 80 Z" fill="#2A2D33"/><path d="M540 60 L480 72 L480 88 L540 80 Z" fill="#2A2D33"/>
+          <text x="250" y="120" text-anchor="middle" class="svglabel">프레임 — 3D 프린팅 Ti 격자 · 스트랩 · 베이어넷 링</text>
+        </g>
+      </g>
+      <g font-family="IBM Plex Sans KR, sans-serif" font-size="12.5">
+        <text x="640" y="226" fill="#C8F04B">■ 무선 전력 송신 코일</text>
+        <text x="640" y="248" fill="#2BB673">■ MCU · AT컷 수정 · 온도 · BLE · 표준전파</text>
+        <text x="640" y="270" fill="#8E95A3">■ 전고체 배터리 150 mAh</text>
+        <text x="640" y="76" fill="#E6E3DC">■ 표시계 (링/셔틀/빛/액체)</text>
+        <text x="640" y="98" fill="#F08A4B">■ 페이스 전용 구동부</text>
+        <text x="640" y="120" fill="#2BB673">■ 수전 코일 · 위치 센서</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">04 · 페이스 라인업</div>
+    <h2>네 개의 원리, 하나의 시계</h2>
+    <p>각 페이스는 오리지널 콘셉트를 코어 위에 올리도록 다시 설계한 것입니다. 페이스에는 배터리가 없으며, 전원은 모두 코어에서 받습니다.</p>
+  </header>
+  <div class="faces">
+    <div class="card"><div class="tag">FACE 01</div><h3>ZERO-AXIS</h3><p class="muted" style="font-size:14px;margin-top:6px">허브리스 회전 링. 코어가 중앙을 차지하므로 관통 구멍 대신 코어의 사파이어 창이 보입니다(관통은 오리지널 전용).</p><dl><dt>코어 1회 충전</dt><dd>약 10개월*</dd><dt>판매가</dt><dd>69만 원</dd></dl></div>
+    <div class="card"><div class="tag">FACE 02</div><h3>LINEA</h3><p class="muted" style="font-size:14px;margin-top:6px">원형 페이스 안의 두 직선 트랙과 정시 플라이백. 라인업 중 가장 저렴한 입문 페이스.</p><dl><dt>코어 1회 충전</dt><dd>약 4개월*</dd><dt>판매가</dt><dd>49만 원</dd></dl></div>
+    <div class="card"><div class="tag">FACE 03</div><h3>STILL</h3><p class="muted" style="font-size:14px;margin-top:6px">가동부 0의 빛의 바늘. 사파이어 모놀리스 페이스, 손목을 들면 점등.</p><dl><dt>코어 1회 충전</dt><dd>약 3개월*</dd><dt>판매가</dt><dd>69만 원</dd></dl></div>
+    <div class="card"><div class="tag">FACE 04</div><h3>FLUX</h3><p class="muted" style="font-size:14px;margin-top:6px">자성 액체 바늘. 무선 전력 코일과 구동 코일 사이에 페라이트 차폐층 추가.</p><dl><dt>코어 1회 충전</dt><dd>약 8개월*</dd><dt>판매가</dt><dd>89만 원</dd></dl></div>
+  </div>
+  <p class="muted" style="font-size:12px;margin-top:10px">* 코어 150 mAh 전고체 배터리, 무선 전력 전달 효율 약 60% 가정의 설계 목표치. 실측 필요.</p>
+</section>
+
+<section>
+  <header>
+    <div class="k">05 · 원가와 가격 구조</div>
+    <h2>코어+프레임 원가 약 7.4만 원, 시작가 119만 원</h2>
+    <p>처음엔 코어+프레임+페이스 1개를 묶어 판매하고, 이후 페이스를 단품으로 판매합니다. 공개 시세 기반 개략 추정이며 공급사 RFQ로 확정해야 합니다.</p>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>모듈</th><th>사양</th><th style="text-align:right">개당 (원)</th></tr></thead>
+      <tbody>
+        <tr><td>타임 코어 셸</td><td>사파이어 상판 + 지르코니아 하판, 유리 프릿 영구 밀봉</td><td class="n">9,000</td></tr>
+        <tr><td>코어 전자</td><td>BLE MCU, AT컷 수정, 온도센서, 표준전파 수신, 6.78 MHz 무선 전력 송신</td><td class="n">11,000</td></tr>
+        <tr><td>전고체 배터리</td><td>150 mAh, 무선 충전 수신</td><td class="n">7,000</td></tr>
+        <tr><td>프레임</td><td>Ti-6Al-4V 3D 프린팅 격자 + 베이어넷 링 CNC</td><td class="n">22,000</td></tr>
+        <tr><td>스트랩</td><td>FKM 러버, 출력 티타늄 버클</td><td class="n">8,000</td></tr>
+        <tr><td>조립 · 검사 · 수율손실</td><td>코어 단일 품목 자동 라인, 수율 96% 가정</td><td class="n">7,000</td></tr>
+        <tr><td>패키지</td><td>페이스 보관 트레이 포함</td><td class="n">10,000</td></tr>
+      </tbody>
+      <tfoot><tr><td>합계</td><td>코어+프레임 · 페이스 1개 번들 시작가 1,190,000원 (LINEA 포함)</td><td class="n">74,000</td></tr></tfoot>
+    </table>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">06 · 기술 리스크와 대응</div>
+    <h2>플랫폼의 대가</h2>
+  </header>
+  <div class="panel tablewrap">
+    <table class="risk">
+      <thead><tr><th>리스크</th><th>내용</th><th>대응</th></tr></thead>
+      <tbody>
+        <tr><td>두께</td><td>코어 + 페이스 적층으로 단일 모델보다 두꺼워짐 (목표 11.5 mm)</td><td>코어 4.0 mm 이내, 페이스 수전 코일을 표시계 하판에 인쇄해 층을 합침.</td></tr>
+        <tr><td>무선 전력 손실</td><td>전달 효율 약 60% → 배터리 수명 감소</td><td>페이스는 움직일 때만 전력 수신, 대기 시 0. 고효율 6.78 MHz 공진 방식.</td></tr>
+        <tr><td>FLUX와 자기장 간섭</td><td>무선 전력 자기장이 자성 액체를 끌 수 있음</td><td>페라이트 차폐층 + 방울 이동 순간에는 전력 전송 정지(시분할).</td></tr>
+        <tr><td>베이어넷 내구</td><td>반복 탈착에 따른 마모 · 유격</td><td>지르코니아 캠 + 티타늄 링, 10,000회 탈착 시험.</td></tr>
+        <tr><td>호환성 약속</td><td>향후 코어 세대 변경 시 구형 페이스 호환</td><td>무선 인터페이스 규격을 공개 고정하고 10년 하위 호환 보증.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">07 · 시리즈 종결 — 다섯 모델 비교</div>
+    <h2>네 개의 질문, 하나의 답</h2>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>항목</th><th>01 ZERO-AXIS</th><th>02 LINEA</th><th>03 STILL</th><th>04 FLUX</th><th>05 CODA</th></tr></thead>
+      <tbody>
+        <tr><td>바꾼 것</td><td>바늘의 위치</td><td>바늘의 궤적</td><td>바늘의 존재</td><td>바늘의 물질</td><td class="win">시계의 단위</td></tr>
+        <tr><td>표시</td><td>회전 링</td><td>셔틀</td><td>빛</td><td>액체</td><td class="win">넷 다</td></tr>
+        <tr><td>코어 수명</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="win">20년 설계</td></tr>
+        <tr><td>양산 규모</td><td>연 10만</td><td>연 20만</td><td>연 15만</td><td>연 10만</td><td class="win">코어 연 40만</td></tr>
+        <tr><td>시작가</td><td>179만</td><td>129만</td><td>149만</td><td>199만</td><td class="win">119만 (+페이스)</td></tr>
+        <tr><td>최대 리스크</td><td>관통부 방수</td><td>전력</td><td>햇빛 가독성</td><td>액체 안정성</td><td>두께 · 무선 효율</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="road" style="margin-top:14px">
+    <div class="card"><div class="when">PHASE 1</div><h3>코어 + LINEA</h3><p>가장 쉬운 페이스로 코어·무선 인터페이스·베이어넷을 검증하며 출시.</p></div>
+    <div class="card"><div class="when">PHASE 2</div><h3>+ ZERO-AXIS</h3><p>회전 링 페이스 추가. 같은 코어 사용자는 페이스만 구매.</p></div>
+    <div class="card"><div class="when">PHASE 3</div><h3>+ STILL</h3><p>광학 페이스 추가, 햇빛 가독성 검증 후.</p></div>
+    <div class="card"><div class="when">PHASE 4</div><h3>+ FLUX</h3><p>액체 캡슐 장기 신뢰성 시험 통과 후 최상위 페이스로.</p></div>
+  </div>
+  <p class="verdict">CODA는 다섯 번째 시계가 아니라 <b>앞의 네 시계를 하나로 묶는 마지막 답</b>입니다. 가장 어려운 부분(시간·전원·밀봉)을 한 번만 완벽하게 만들고, 파격은 페이스로 끝없이 더한다 — <b>“평생 하나의 시계, 끝나지 않는 얼굴들.”</b></p>
+</section>
+
+<footer>CODA · 콘셉트 디자인 문서 · 수치(원가·정확도·전원)는 공개 부품 사양 기반 설계 목표치이며 시제품 검증이 필요합니다.</footer>
+</div>
+
+<script>
+(function(){
+  const face=document.getElementById("face"), wrap=document.getElementById("faceWrap");
+  const P=(r,deg)=>{const a=deg*Math.PI/180;return [r*Math.sin(a),-r*Math.cos(a)];};
+  const f1=n=>n.toFixed(1);
+  let seed=11; const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+  // static decorations per face
+  function ticks(r1,r2,n,every,c1,c2,w1,w2){let s="";for(let i=0;i<n;i++){const big=i%every===0,[x1,y1]=P(r1,i*360/n),[x2,y2]=P(big?r2:r1-5,i*360/n);s+=`<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="${big?c1:c2}" stroke-width="${big?w1:w2}"/>`;}return s;}
+  const stillField=(()=>{let s="";for(let i=0;i<520;i++){const r=16+168*Math.sqrt(rnd()),a=rnd()*360,[x,y]=P(r,a);s+=`<circle cx="${f1(x)}" cy="${f1(y)}" r=".7" fill="#9FB4C8" opacity="${(.05+rnd()*.08).toFixed(2)}"/>`;}
+    for(let h=0;h<12;h++)for(let j=0;j<(h%3?6:12);j++){const [x,y]=P(158+j*2.2,h*30);s+=`<circle cx="${f1(x)}" cy="${f1(y)}" r=".9" fill="#C9D6E2" opacity=".55"/>`;}return s;})();
+  const handPts=(r0,r1,sp,n)=>Array.from({length:n},()=>({r:r0+(r1-r0)*rnd(),w:(rnd()-.5)*sp,s:.8+rnd(),o:.45+rnd()*.55}));
+  const stMin=handPts(16,184,3,200), stHr=handPts(16,110,6,160);
+  const lightHand=(pts,deg,col)=>{const a=deg*Math.PI/180,s=Math.sin(a),c=Math.cos(a);return `<g fill="${col}" filter="url(#glow)">`+pts.map(p=>`<circle cx="${f1(p.r*s+p.w*c)}" cy="${f1(-p.r*c+p.w*s)}" r="${p.s.toFixed(2)}" opacity="${p.o.toFixed(2)}"/>`).join("")+"</g>";};
+
+  const render={
+    zero(t){const md=Math.floor(t.sH/10),hd=Math.floor(t.s12/120);
+      return `<circle r="186" fill="#101217"/>${ticks(185,174,60,5,"#E6E9EE","#5B616B",2.2,1)}
+      <g transform="rotate(${md})"><circle r="170" fill="#0D1016" stroke="#2C323C"/><rect x="-3" y="-170" width="6" height="34" rx="1.5" fill="#C8F04B"/></g>
+      <g transform="rotate(${hd})"><circle r="134" fill="#0A0C10" stroke="#2C323C"/><rect x="-7" y="-132" width="14" height="32" rx="3" fill="#F1F3F6"/></g>
+      <circle r="98" fill="#14171C"/>${[0,3,6,9].map(i=>{const[x,y]=P(86,i*30);return `<text x="${f1(x)}" y="${f1(y+3.5)}" text-anchor="middle" font-family="Michroma" font-size="9" fill="#E6E9EE">${i||12}</text>`}).join("")}
+      <circle r="74" fill="url(#coreWin)" stroke="#5B616B" stroke-width="3"/><text y="4" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#4BD3F0" opacity=".8">CORE</text>`;},
+    linea(t){const X0=-140,L=280,mx=X0+L*Math.floor(t.sH/10)/360,hx=X0+L*Math.floor(t.s12/120)/360;let sc="";
+      for(let i=0;i<=12;i++){const x=X0+L*i/12,b=i%3===0;sc+=`<line x1="${f1(x)}" y1="-70" x2="${f1(x)}" y2="${b?-82:-76}" stroke="${b?"#E6E9EE":"#5B616B"}" stroke-width="${b?2:1}"/>`+(b?`<text x="${f1(x)}" y="-90" text-anchor="middle" font-family="Michroma" font-size="9" fill="#E6E9EE">${i}</text>`:"");}
+      for(let i=0;i<=60;i++){const x=X0+L*i/60,b=i%15===0,m=i%5===0;sc+=`<line x1="${f1(x)}" y1="72" x2="${f1(x)}" y2="${b?86:m?81:77}" stroke="${b?"#E6E9EE":m?"#A9AFB8":"#4A4F57"}" stroke-width="${b?2:.8}"/>`+(b?`<text x="${f1(x)}" y="99" text-anchor="middle" font-family="Michroma" font-size="8" fill="#E6E9EE">${i}</text>`:"");}
+      return `<circle r="186" fill="url(#darkDial)"/>${sc}<rect x="-146" y="-42" width="292" height="8" rx="4" fill="url(#screw)"/><rect x="-146" y="36" width="292" height="8" rx="4" fill="url(#screw)"/>
+      <line x1="-150" y1="0" x2="150" y2="0" stroke="#2C323C"/>
+      <g transform="translate(${f1(hx)},0)"><rect x="-10" y="-64" width="20" height="52" rx="5" fill="#E8EAEE"/><rect x="-2" y="-60" width="4" height="44" fill="#F1F3F6" stroke="#9DA3AC" stroke-width=".5"/></g>
+      <g transform="translate(${f1(mx)},0)"><rect x="-7" y="14" width="14" height="52" rx="4" fill="#E8EAEE"/><rect x="-2" y="18" width="4" height="44" rx="1.5" fill="#C8F04B"/></g>`;},
+    still(t){const m=t.m,h=t.hStep;
+      return `<circle r="186" fill="url(#darkDial)"/>${stillField}${lightHand(stMin,m*6,"#7FF0FF")}${lightHand(stHr,h*6,"#FFF4E0")}<circle r="12" fill="#050608" stroke="#2C323C"/>`;},
+    flux(t){const [mx,my]=P(150,t.m*6),[hx,hy]=P(95,t.hStep*6);let tk="";
+      for(let i=0;i<60;i++){const[x,y]=P(176,i*6),b=i%5===0;tk+=`<circle cx="${f1(x)}" cy="${f1(y)}" r="${b?2.4:1.1}" fill="${b?"#5E5A52":"#A8A398"}"/>`;}
+      for(let i=0;i<12;i++){const[x1,y1]=P(62,i*30),[x2,y2]=P(i%3?55:48,i*30);tk+=`<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="#5E5A52" stroke-width="${i%3?1.6:3}" stroke-linecap="round"/>`;}
+      return `<circle r="186" fill="url(#whiteDial)"/><circle r="150" fill="none" stroke="#D2CEC5" stroke-width="32"/><circle r="150" fill="none" stroke="#E6E3DC" stroke-width="28"/>
+      <circle r="95" fill="none" stroke="#D2CEC5" stroke-width="42"/><circle r="95" fill="none" stroke="#E6E3DC" stroke-width="38"/>${tk}
+      <g filter="url(#goo)" fill="#0B0B0E"><circle cx="${f1(mx)}" cy="${f1(my)}" r="15"/><circle cx="${f1(hx)}" cy="${f1(hy)}" r="21"/></g>
+      <circle cx="${f1(mx-4)}" cy="${f1(my-5)}" r="3" fill="#fff" opacity=".45"/><circle cx="${f1(hx-6)}" cy="${f1(hy-7)}" r="4" fill="#fff" opacity=".45"/>
+      <text y="4" text-anchor="middle" font-family="Michroma" font-size="9" letter-spacing="3" fill="#A8A398">FLUX</text>`;}
+  };
+
+  let cur="flux", swapping=false, lastKey="";
+  const btns=[...document.querySelectorAll("[data-face]")];
+  function setFace(f){
+    if(f===cur||swapping)return; swapping=true;
+    btns.forEach(b=>b.setAttribute("aria-pressed",b.dataset.face===f));
+    wrap.classList.add("out");
+    setTimeout(()=>{cur=f;lastKey="";draw(true);wrap.classList.remove("out");wrap.classList.add("in0");
+      wrap.getBoundingClientRect();
+      requestAnimationFrame(()=>{wrap.classList.remove("in0");setTimeout(()=>swapping=false,460);});},620);
+  }
+  btns.forEach(b=>b.onclick=()=>{stopAuto();setFace(b.dataset.face);});
+
+  const ro=document.getElementById("readout"), bLive=document.getElementById("bLive"), bFast=document.getElementById("bFast"), bAuto=document.getElementById("bAuto");
+  let fast=false, base=0, simBase=0, last=Date.now(), autoT=null;
+  bLive.onclick=()=>{fast=false;bLive.setAttribute("aria-pressed","true");bFast.setAttribute("aria-pressed","false");};
+  bFast.onclick=()=>{base=Date.now();simBase=last;fast=true;bLive.setAttribute("aria-pressed","false");bFast.setAttribute("aria-pressed","true");};
+  const order=["zero","linea","still","flux"];
+  function stopAuto(){if(autoT){clearInterval(autoT);autoT=null;bAuto.setAttribute("aria-pressed","false");}}
+  bAuto.onclick=()=>{if(autoT){stopAuto();return;}bAuto.setAttribute("aria-pressed","true");
+    const step=()=>setFace(order[(order.indexOf(cur)+1)%4]);step();autoT=setInterval(step,3200);};
+
+  function timeParts(){const d=new Date(last),m=d.getMinutes(),s=d.getSeconds(),sH=m*60+s,s12=(d.getHours()%12)*3600+sH;
+    return {d,m,s,sH,s12,hStep:((d.getHours()%12)*5+Math.floor(m/12))};}
+  function draw(force){
+    const t=timeParts();
+    const key=cur+":"+(cur==="zero"||cur==="linea"?Math.floor(t.sH/10)+"/"+Math.floor(t.s12/120):t.m+"/"+t.hStep);
+    if(force||key!==lastKey){face.innerHTML=render[cur](t);lastKey=key;}
+    const p=n=>String(n).padStart(2,"0");
+    ro.textContent=p(t.d.getHours())+":"+p(t.m)+":"+p(t.s);
+  }
+  function tick(){const real=Date.now();last=fast?simBase+(real-base)*300:real;draw(false);requestAnimationFrame(tick);}
+  tick();
+})();
+</script>
+</body>
+</html>

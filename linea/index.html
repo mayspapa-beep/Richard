@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LINEA 시계</title>
+<meta name="description" content="원을 버리고 직선 위에서 시간이 흐르는 리니어 셔틀 시계 — 스마트폰 카메라 액추에이터 공급망으로 양산하는 미래형 프리미엄 시계 콘셉트">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans+KR:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#07080A;--bg2:#0E1014;--surface:#13161C;--line:#22262E;--line2:#343A45;
+  --ink:#ECEEF2;--muted:#8E95A3;--accent:#C8F04B;--accent2:#4BD3F0;--warn:#F08A4B;
+  --ti1:#9AA1AC;--ti2:#5B616B;--ti3:#2A2E35;--sap:rgba(30,40,55,.55);
+  --f-d:"Michroma","IBM Plex Sans KR",sans-serif;--f-b:"IBM Plex Sans KR",system-ui,sans-serif;--f-m:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+  --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#F3F4F6;--bg2:#E9EBEF;--surface:#FFFFFF;--line:#D9DCE2;--line2:#C3C8D0;
+    --ink:#12151A;--muted:#5D6470;--accent:#5E7F00;--accent2:#0A86B8;--warn:#B8561A;color-scheme:light;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);line-height:1.7;font-size:15px}
+.wrap{max-width:1120px;margin:0 auto;padding:48px 16px 80px}
+h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+p{margin:0}
+.k{font:500 11px var(--f-m);letter-spacing:.18em;color:var(--accent);text-transform:uppercase}
+.muted{color:var(--muted)}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero h1{font-family:var(--f-d);font-weight:400;font-size:clamp(34px,6vw,58px);letter-spacing:.08em;line-height:1.1;margin:14px 0 18px}
+.hero .lead{font-size:17px;color:var(--muted);max-width:32em}
+.stage{position:relative;aspect-ratio:1/1.18;max-width:520px;width:100%;margin:0 auto}
+.stage svg{width:100%;height:100%;display:block}
+.readout{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:22px}
+.time{font:500 28px var(--f-m);letter-spacing:.06em}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font:500 12px var(--f-m);letter-spacing:.08em;background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:999px;padding:8px 14px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:#0A0C08;border-color:var(--accent)}
+/* sections */
+section{padding-top:72px}
+section > header{margin-bottom:28px;max-width:46em}
+section > header h2{font-size:clamp(22px,3.2vw,30px);margin-top:10px}
+section > header p{color:var(--muted);margin-top:10px}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.g5{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0}
+.card h3{font-size:16px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:14px}
+.rule{display:flex;flex-direction:column;gap:10px}
+.rule .old{font:500 12px var(--f-m);color:var(--muted);text-decoration:line-through;text-decoration-color:var(--warn)}
+.rule .new{font-size:16px;font-weight:600}
+.num{font:400 30px var(--f-d);color:var(--accent);line-height:1}
+.req .tag{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--accent2)}
+.req .big{font:500 22px var(--f-m);margin:8px 0 6px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;overflow:hidden}
+.panel svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px var(--f-m);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+td.n{font-family:var(--f-m);text-align:right;white-space:nowrap}
+tfoot td{font-weight:600;border-bottom:none}
+.tablewrap{overflow-x:auto}
+.flow{counter-reset:s;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.flow li{list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;font-size:14px}
+.flow li::before{counter-increment:s;content:"0" counter(s);display:block;font:500 12px var(--f-m);color:var(--accent);margin-bottom:6px}
+.flow li b{display:block;margin-bottom:4px}
+.flow li span{color:var(--muted)}
+.svgtext{font-family:var(--f-m);font-size:11px;fill:var(--muted)}
+.svglabel{font-family:var(--f-b);font-size:12px;fill:var(--ink)}
+footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.risk td:first-child{font-weight:600;white-space:nowrap}
+</style>
+<style>
+.nav{display:flex;gap:16px;flex-wrap:wrap;font:500 12px var(--f-m);letter-spacing:.08em;margin-bottom:40px}
+.nav a{color:var(--muted);text-decoration:none;border-bottom:1px solid transparent}
+.nav a[aria-current]{color:var(--ink);border-color:var(--accent)}
+.stage.wide{aspect-ratio:1/1.1}
+td.win{color:var(--accent);font-weight:600}
+.verdict{margin-top:14px;font-size:15px}
+.verdict b{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="nav"><a href="../zero-axis/">01 ZERO-AXIS</a><a href="./" aria-current="page">02 LINEA</a><a href="../still/">03 STILL</a><a href="../flux/">04 FLUX</a><a href="../coda/">05 CODA</a><a href="../signum/">06 SIGNUM · 최종</a></nav>
+
+<div class="hero">
+  <div>
+    <div class="k">Concept 02 · Linear Shuttle Chronometer</div>
+    <h1>LINEA</h1>
+    <p class="lead">시계는 300년 동안 <b>원</b>이었습니다. LINEA는 원을 버렸습니다. 시간은 사파이어 창 안의 두 개의 직선 트랙 위를 <b>미끄러지고</b>, 매 정시 분 셔틀이 0으로 한 번에 날아 돌아갑니다. 구동계는 시계 공장이 아니라 <b>스마트폰 카메라 렌즈 공장</b>에서 옵니다.</p>
+    <div class="readout">
+      <div class="time" id="readout">--:--:--</div>
+      <div class="btns">
+        <button id="bLive" aria-pressed="true">실시간</button>
+        <button id="bFast" aria-pressed="false">빨리감기 ×600</button>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13px;margin-top:10px">위 트랙 = 시(0–12) · 아래 트랙 = 분(0–60). 분 셔틀은 10초마다 0.094 mm씩 전진하고, 정시가 되면 1.2초 만에 0으로 플라이백합니다. 빨리감기로 보면 6초마다 플라이백합니다.</p>
+  </div>
+
+  <div class="stage wide">
+    <svg id="watch" viewBox="-260 -286 520 572" role="img" aria-label="LINEA 상면도">
+      <defs>
+        <linearGradient id="ti" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#D0D5DC"/><stop offset=".45" stop-color="#737983"/><stop offset=".55" stop-color="#4A4F57"/><stop offset="1" stop-color="#A9AFB8"/>
+        </linearGradient>
+        <linearGradient id="strap" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#15171B"/><stop offset=".5" stop-color="#2A2D33"/><stop offset="1" stop-color="#15171B"/>
+        </linearGradient>
+        <linearGradient id="win" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#151A22"/><stop offset="1" stop-color="#07090C"/>
+        </linearGradient>
+        <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+        <pattern id="screw" width="4" height="8" patternUnits="userSpaceOnUse" patternTransform="skewX(-30)">
+          <rect width="4" height="8" fill="#2A2F37"/><rect width="1.6" height="8" fill="#59606B"/>
+        </pattern>
+        <linearGradient id="shut" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#B9BEC6"/><stop offset=".5" stop-color="#F6F7F9"/><stop offset="1" stop-color="#9DA3AC"/>
+        </linearGradient>
+      </defs>
+
+      <!-- strap -->
+      <path d="M-110 -150 L-100 -286 L100 -286 L110 -150 Z" fill="url(#strap)"/>
+      <path d="M-110 150 L-100 286 L100 286 L110 150 Z" fill="url(#strap)"/>
+
+      <!-- case: 46 x 28 mm -->
+      <rect x="-230" y="-140" width="460" height="280" rx="70" fill="url(#ti)"/>
+      <rect x="-219" y="-129" width="438" height="258" rx="60" fill="#1B1E23"/>
+      <!-- sapphire window -->
+      <rect x="-212" y="-122" width="424" height="244" rx="54" fill="url(#win)"/>
+
+      <!-- HOUR TRACK -->
+      <g id="hrScale"></g>
+      <rect x="-176" y="-50" width="352" height="8" rx="4" fill="url(#screw)"/>
+      <g id="hrShuttle">
+        <rect x="-11" y="-74" width="22" height="56" rx="5" fill="url(#shut)"/>
+        <rect x="-2" y="-70" width="4" height="48" rx="1.5" fill="#F1F3F6"/>
+        <rect x="-1.4" y="-70" width="2.8" height="48" rx="1" fill="#1B1E23" opacity=".35"/>
+      </g>
+
+      <!-- MINUTE TRACK -->
+      <g id="minScale"></g>
+      <rect x="-176" y="44" width="352" height="8" rx="4" fill="url(#screw)"/>
+      <g id="minShuttle">
+        <rect x="-7" y="20" width="14" height="56" rx="4" fill="url(#shut)"/>
+        <rect x="-2" y="24" width="4" height="48" rx="1.5" fill="var(--accent)"/>
+      </g>
+
+      <!-- divider engraving -->
+      <line x1="-176" y1="0" x2="176" y2="0" stroke="#2C323C"/>
+      <text x="-190" y="-42" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#5B616B">H</text>
+      <text x="-190" y="52" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9" fill="#5B616B">M</text>
+
+      <rect x="-212" y="-122" width="424" height="244" rx="54" fill="url(#glare)"/>
+      <text x="0" y="136" text-anchor="middle" font-family="Michroma" font-size="7" letter-spacing="3" fill="#2A2E35">LINEA</text>
+    </svg>
+  </div>
+</div>
+
+<section>
+  <header>
+    <div class="k">01 · 파괴한 시계공장 원칙</div>
+    <h2>ZERO-AXIS가 ‘중심’을 버렸다면, LINEA는 ‘원’을 버렸다</h2>
+    <p>원형 다이얼, 회전하는 바늘, 시계 전용 무브먼트 — 시간 표시의 기하학 자체를 바꾸고, 부품은 다른 산업의 초대량 공급망에서 가져옵니다.</p>
+  </header>
+  <div class="grid g3">
+    <div class="card rule"><div class="num">01</div><div class="old">시간은 원을 돈다</div><div class="new">시간은 직선 위를 흐른다</div><p>12시간과 60분을 각각 34 mm 직선 트랙으로 펼침. ‘지금이 한 시간 중 어디쯤인가’가 길이로 즉시 읽힙니다 — 진행 막대(progress bar)처럼.</p></div>
+    <div class="card rule"><div class="num">02</div><div class="old">바늘은 회전한다</div><div class="new">셔틀이 미끄러지고, 정시에 날아간다</div><p>세라믹 셔틀이 리드스크루를 따라 직선 이동. 매 정시 분 셔틀이 1.2초 만에 0으로 귀환(플라이백) — 하루 24번의 작은 퍼포먼스.</p></div>
+    <div class="card rule"><div class="num">03</div><div class="old">무브먼트는 시계 회사가 만든다</div><div class="new">구동계는 스마트폰 카메라 공급망에서</div><p>스마트폰 줌·AF에 쓰이는 초소형 스텝모터 + 리드스크루 액추에이터는 연 수억 개 생산되는 검증 부품. 시계 전용 금형·공정이 필요 없습니다.</p></div>
+    <div class="card rule"><div class="num">04</div><div class="old">시계는 둥글고 손목 위에 얹힌다</div><div class="new">손목을 가로지르는 곡면 바</div><p>46 × 28 mm, 바닥면은 손목 반경 R32에 맞춘 오목 곡면. 손목 방향이 아닌 가로 방향으로 길게 누워 소매 아래에서도 걸리지 않습니다.</p></div>
+    <div class="card rule"><div class="num">05</div><div class="old">눈금은 다이얼에 인쇄한다</div><div class="new">눈금은 사파이어 ‘속’에 새긴다</div><p>사파이어 창 내부에 펨토초 레이저로 눈금을 각인. 인쇄·인덱스 부착 공정이 사라지고, 눈금이 셔틀 위 공중에 떠 보입니다.</p></div>
+    <div class="card rule"><div class="num">06</div><div class="old">위치는 기어가 기억한다</div><div class="new">위치는 센서가 절대값으로 안다</div><p>각 셔틀 아래 AMR 리니어 엔코더가 절대 위치를 μm 단위로 측정. 충격·백래시로 밀려도 매 스텝마다 즉시 보정합니다.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">02 · 다섯 가지 조건 검증</div>
+    <h2>ZERO-AXIS보다 덜 화려하지만, 더 싸고 더 쉽게</h2>
+  </header>
+  <div class="grid g5">
+    <div class="card req"><div class="tag">① 제조 가능성</div><div class="big">평면 사파이어</div><p>곡면·링 사파이어 없이 평판 사파이어 1장. 케이스는 단순 직사각 포켓 가공. 액추에이터는 기성품 개조.</p></div>
+    <div class="card req"><div class="tag">② 정확도</div><div class="big">±1 s / 년</div><p>ZERO-AXIS와 같은 온도보상 AT컷 수정 + BLE/표준전파 동기. 표시 위치 오차는 엔코더로 ±0.02 mm 이내.</p></div>
+    <div class="card req"><div class="tag">③ 파격</div><div class="big">원 0 · 회전 0</div><p>회전하는 부품이 겉으로 하나도 보이지 않는 아날로그 시계. 정시 플라이백이라는 새로운 ‘시보’.</p></div>
+    <div class="card req"><div class="tag">④ 프리미엄</div><div class="big">Ti · 사파이어 · 세라믹</div><p>Ti G5 곡면 케이스, 내부 각인 사파이어, 경면 지르코니아 셔틀. 노출된 리드스크루가 기계적 디테일이 됩니다.</p></div>
+    <div class="card req"><div class="tag">⑤ 대량 양산</div><div class="big">연 20만 개</div><p>액추에이터·배터리·회로가 전부 스마트폰 공급망 부품. 사이클타임 60초/개, 수율 목표 96%.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">03 · 내부 배치 · 측면</div>
+    <h2>네모 안에서는 모든 것이 쉬워진다</h2>
+    <p>직사각형 케이스는 직사각형 배터리·기판·액추에이터를 그대로 받아들입니다. ZERO-AXIS가 링형 맞춤 부품을 요구했던 것과 정반대입니다.</p>
+  </header>
+  <div class="panel">
+    <svg viewBox="0 0 900 360" role="img" aria-label="LINEA 내부 배치도 (X-ray 상면)">
+      <g transform="translate(60,40)">
+        <rect x="0" y="0" width="460" height="280" rx="70" fill="none" stroke="#9AA1AC" stroke-width="2"/>
+        <rect x="18" y="18" width="424" height="244" rx="54" fill="none" stroke="#4BD3F0" stroke-dasharray="5 4"/>
+        <!-- hour actuator -->
+        <rect x="40" y="76" width="34" height="34" rx="5" fill="#F08A4B" fill-opacity=".8"/>
+        <rect x="74" y="88" width="352" height="10" rx="5" fill="#5B616B"/>
+        <rect x="226" y="80" width="22" height="26" rx="4" fill="#E6E9EE"/>
+        <rect x="80" y="104" width="340" height="5" fill="#E0457B" fill-opacity=".8"/>
+        <!-- minute actuator -->
+        <rect x="40" y="170" width="34" height="34" rx="5" fill="#F08A4B" fill-opacity=".8"/>
+        <rect x="74" y="182" width="352" height="10" rx="5" fill="#5B616B"/>
+        <rect x="330" y="174" width="14" height="26" rx="3" fill="#C8F04B"/>
+        <rect x="80" y="198" width="340" height="5" fill="#E0457B" fill-opacity=".8"/>
+        <!-- pcb + battery (lower layer, dashed) -->
+        <rect x="60" y="120" width="340" height="40" rx="6" fill="#2BB673" fill-opacity=".35" stroke="#2BB673"/>
+        <rect x="90" y="226" width="280" height="24" rx="6" fill="#8E95A3" fill-opacity=".35" stroke="#8E95A3" stroke-dasharray="4 3"/>
+        <rect x="90" y="30" width="280" height="24" rx="6" fill="#6C5CE7" fill-opacity=".5" stroke="#6C5CE7"/>
+      </g>
+      <g font-family="IBM Plex Sans KR, sans-serif" font-size="13">
+        <text x="560" y="70" fill="#6C5CE7">■ 솔라 스트립 (창 상단 베젤 아래)</text>
+        <text x="560" y="100" fill="#F08A4B">■ 스텝모터 Ø3.4 ×2 (카메라 AF 계열)</text>
+        <text x="560" y="130" fill="#9AA1AC">■ 리드스크루 M0.6 · 피치 0.3 mm</text>
+        <text x="560" y="160" fill="#E6E9EE">■ 시 셔틀 · <tspan fill="#C8F04B">분 셔틀</tspan> (지르코니아)</text>
+        <text x="560" y="190" fill="#E0457B">■ AMR 리니어 엔코더 스트립 ×2</text>
+        <text x="560" y="220" fill="#2BB673">■ PCB: BLE MCU · AT컷 수정 · 온도센서</text>
+        <text x="560" y="250" fill="#8E95A3">■ 각형 Li-Po 셀 (하층) · 무선충전</text>
+        <text x="560" y="290" fill="var(--muted)" font-family="JetBrains Mono, monospace" font-size="11">X-ray 상면 · 1 mm = 10 px</text>
+      </g>
+    </svg>
+  </div>
+  <div class="panel" style="margin-top:14px">
+    <svg viewBox="0 0 900 280" role="img" aria-label="LINEA 측면도 (6시 방향에서 본 모습)">
+      <defs>
+        <linearGradient id="flank" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#D3D8DF"/><stop offset=".4" stop-color="#8C929C"/><stop offset="1" stop-color="#3A3E45"/>
+        </linearGradient>
+      </defs>
+      <!-- wrist arc R ~ 32mm -->
+      <path d="M150 222 Q450 96 750 222" stroke="#C08C6C" stroke-width="16" fill="none" opacity=".45" stroke-linecap="round"/>
+      <!-- case: top flat sapphire 46mm=460px wide (scale 10), thickness 9.6mm center, concave bottom -->
+      <path d="M220 88 L680 88 Q700 88 702 108 L706 150 Q706 170 690 176 Q450 120 210 176 Q194 170 194 150 L198 108 Q200 88 220 88 Z" fill="url(#flank)"/>
+      <path d="M226 88 L232 80 L668 80 L674 88 Z" fill="#4BD3F0" fill-opacity=".45" stroke="#4BD3F0" stroke-width=".8"/>
+      <line x1="198" y1="96" x2="702" y2="96" stroke="#EEF1F5" stroke-opacity=".7"/>
+      <!-- dims -->
+      <line x1="194" y1="50" x2="706" y2="50" stroke="var(--muted)"/><line x1="194" y1="44" x2="194" y2="56" stroke="var(--muted)"/><line x1="706" y1="44" x2="706" y2="56" stroke="var(--muted)"/>
+      <text x="450" y="42" text-anchor="middle" class="svgtext">46.0 mm (손목을 가로지름)</text>
+      <line x1="760" y1="80" x2="760" y2="148" stroke="var(--muted)"/><line x1="754" y1="80" x2="766" y2="80" stroke="var(--muted)"/><line x1="754" y1="148" x2="766" y2="148" stroke="var(--muted)"/>
+      <text x="772" y="110" class="svgtext">중앙 두께 6.8 mm</text>
+      <line x1="720" y1="80" x2="720" y2="176" stroke="var(--muted)" stroke-dasharray="2 3"/>
+      <text x="772" y="170" class="svgtext">끝단 9.6 mm</text>
+      <text x="450" y="236" text-anchor="middle" class="svgtext">바닥 R32 오목 곡면 — 손목에 밀착</text>
+      <text x="450" y="262" text-anchor="middle" class="svgtext">6시 방향에서 본 측면 · 스트랩은 앞뒤 긴 변 중앙에 결합 · 측면 천공 0</text>
+    </svg>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">04 · 구동과 정확도</div>
+    <h2>카메라가 초점을 맞추듯, 시간을 맞춘다</h2>
+  </header>
+  <div class="grid g3">
+    <div class="card"><h3>리니어 셔틀</h3><p>Ø3.4 mm 2상 스텝모터가 M0.6 리드스크루(피치 0.3 mm)를 돌리면, 안티백래시 너트가 붙은 세라믹 셔틀이 직선 이동. 분 트랙 34 mm를 360 스텝으로 나눠 10초마다 0.094 mm 전진.</p></div>
+    <div class="card"><h3>정시 플라이백</h3><p>59분 50초 → 0분, 분 셔틀이 마이크로스텝 가속으로 1.2초 만에 34 mm 귀환. 12시간마다 시 셔틀도 같은 동작. 거의 무음이며, 시계 전체에서 유일하게 ‘빠르게’ 움직이는 순간.</p></div>
+    <div class="card"><h3>절대 위치 센싱</h3><p>셔틀 하부 자석 + 트랙 아래 AMR 엔코더 스트립. 스텝 카운트를 믿지 않고 실제 위치를 매번 확인 → 낙하 충격에도 표시가 틀리지 않습니다.</p></div>
+    <div class="card"><h3>시간 기준</h3><p>8.4 MHz AT컷 수정 + 디지털 온도보상으로 단독 연 ±1초. 하루 1회 BLE·표준전파 동기 시 오차 &lt; 0.05초.</p></div>
+    <div class="card"><h3>전원</h3><p>각형 Li-Po 셀 + 베젤 아래 솔라 스트립. 리드스크루 구동은 회전 바늘보다 에너지를 더 쓰므로 목표는 완충 3개월 + 실내광 솔라 보조. 무선 충전, 커넥터 구멍 없음.</p></div>
+    <div class="card"><h3>조작</h3><p>크라운 없음. 케이스 긴 변 양 끝의 정전식 존 — 문지르면 셔틀이 트랙 끝까지 미끄러지며 배터리·동기 상태를 길이로 보여줍니다.</p></div>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">05 · 원가 구조 (연 20만 개 기준 추정)</div>
+    <h2>원가 약 7만 원, 판매가 129만 원대</h2>
+    <p>평판 사파이어와 기성 액추에이터 덕분에 ZERO-AXIS 대비 원가 약 23% 절감. 공개 부품 시세 기반 개략 추정이며 공급사 RFQ로 확정해야 합니다.</p>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>모듈</th><th>사양</th><th style="text-align:right">개당 (원)</th></tr></thead>
+      <tbody>
+        <tr><td>곡면 케이스</td><td>Ti G5, 3축+로터리 CNC, 바닥 R32</td><td class="n">20,000</td></tr>
+        <tr><td>사파이어 창</td><td>평판, 내부 펨토초 레이저 눈금 각인, AR 코팅</td><td class="n">8,500</td></tr>
+        <tr><td>리니어 액추에이터 ×2</td><td>카메라 AF 계열 스텝모터 + 리드스크루 + 안티백래시 너트</td><td class="n">7,000</td></tr>
+        <tr><td>셔틀 ×2</td><td>지르코니아 CIM, 경면, 루미노바</td><td class="n">2,000</td></tr>
+        <tr><td>전자</td><td>BLE MCU, AT컷 수정, 온도센서, AMR 엔코더 ×2, PCB</td><td class="n">8,500</td></tr>
+        <tr><td>전원</td><td>각형 Li-Po + 솔라 스트립 + 무선충전 코일</td><td class="n">4,500</td></tr>
+        <tr><td>스트랩</td><td>FKM 러버, 긴 변 중앙 결합 러그리스 구조</td><td class="n">8,000</td></tr>
+        <tr><td>조립 · 검사 · 수율손실</td><td>자동 라인, 수율 96% 가정</td><td class="n">8,000</td></tr>
+        <tr><td>패키지</td><td>-</td><td class="n">4,000</td></tr>
+      </tbody>
+      <tfoot><tr><td>합계</td><td>목표 판매가 1,290,000원</td><td class="n">70,500</td></tr></tfoot>
+    </table>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">06 · 기술 리스크와 대응</div>
+    <h2>직선의 약점</h2>
+  </header>
+  <div class="panel tablewrap">
+    <table class="risk">
+      <thead><tr><th>리스크</th><th>내용</th><th>대응</th></tr></thead>
+      <tbody>
+        <tr><td>전력 소모</td><td>리드스크루 마찰로 회전 바늘보다 스텝당 에너지 큼</td><td>밤 시간대 저해상도 모드(분 셔틀 1분 스텝), 솔라 스트립, 3개월 목표로 보수적 설정. 시제품에서 실측 필수.</td></tr>
+        <tr><td>충격 · 백래시</td><td>낙하 시 셔틀 밀림, 너트 유격</td><td>안티백래시 스프링 너트 + 엔코더 절대위치 보정. 셔틀 질량 0.05 g 이하로 경량화.</td></tr>
+        <tr><td>오염 · 마모</td><td>노출 리드스크루에 먼지·윤활유 문제</td><td>창 내부는 밀폐 건조 질소 충전 챔버. 건식 DLC 코팅 스크루로 무윤활.</td></tr>
+        <tr><td>가독성</td><td>직선 시간 표시에 대한 학습 필요</td><td>진행 막대처럼 ‘얼마나 지났나’는 오히려 직관적. 0·15·30·45 주요 눈금 강조.</td></tr>
+        <tr><td>공급 의존</td><td>카메라 액추에이터 사양 변경 주기가 짧음</td><td>2개 공급사 이중화, 시계용 장기 공급 계약(LTB) 조건 명시.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <header>
+    <div class="k">07 · 콘셉트 비교</div>
+    <h2>ZERO-AXIS vs LINEA</h2>
+  </header>
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>항목</th><th>01 ZERO-AXIS</th><th>02 LINEA</th></tr></thead>
+      <tbody>
+        <tr><td>깨는 핵심 원칙</td><td>중심축 · 막힌 다이얼</td><td>원형 시간 · 회전 표시</td></tr>
+        <tr><td>표시 방식</td><td>허브리스 회전 링 2개</td><td>리니어 셔틀 2개 + 정시 플라이백</td></tr>
+        <tr><td>형태</td><td>Ø42 도넛형, 관통 코어</td><td>46 × 28 곡면 바</td></tr>
+        <tr><td>첫인상 임팩트</td><td class="win">매우 높음 (손목이 보임)</td><td>높음</td></tr>
+        <tr><td>제조 난이도</td><td>높음 (링형 사파이어·링형 배터리·2중 밀봉)</td><td class="win">중간 (평판 사파이어·기성 부품)</td></tr>
+        <tr><td>전력 여유</td><td class="win">큼 (회전 링, 8개월)</td><td>작음 (리드스크루, 3개월 목표)</td></tr>
+        <tr><td>정확도</td><td>±1 s/년</td><td>±1 s/년</td></tr>
+        <tr><td>추정 원가 / 판매가</td><td>92,000원 / 179만 원</td><td class="win">70,500원 / 129만 원</td></tr>
+        <tr><td>양산 규모 목표</td><td>연 10만 개</td><td class="win">연 20만 개</td></tr>
+        <tr><td>최대 리스크</td><td>관통부 방수</td><td>전력 소모 · 리드스크루 내구</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="verdict">추천 순서: <b>LINEA를 먼저 시제품화</b>해 브랜드와 공급망을 검증하고, 같은 전자 플랫폼(MCU·수정·동기·센서 보정)을 재사용해 <b>ZERO-AXIS를 플래그십</b>으로 올리는 2단계 전략. 두 콘셉트는 표시계만 다르고 시간 기준 회로는 공유합니다.</p>
+</section>
+
+<footer>LINEA · 콘셉트 디자인 문서 · 수치(원가·정확도·전원)는 공개 부품 사양 기반 설계 목표치이며 시제품 검증이 필요합니다.</footer>
+</div>
+
+<script>
+(function(){
+  const NS="http://www.w3.org/2000/svg", X0=-170, L=340;
+  function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+  const hs=document.getElementById("hrScale"), ms=document.getElementById("minScale");
+  for(let i=0;i<=12;i++){
+    const x=X0+L*i/12, big=i%3===0;
+    hs.appendChild(el("line",{x1:x,y1:-82,x2:x,y2:big?-94:-88,stroke:big?"#E6E9EE":"#5B616B","stroke-width":big?2:1.2}));
+    if(big){const t=el("text",{x:x,y:-100,"text-anchor":"middle","font-family":"Michroma, sans-serif","font-size":10,fill:"#E6E9EE"});t.textContent=i;hs.appendChild(t);}
+  }
+  for(let i=0;i<=60;i++){
+    const x=X0+L*i/60, big=i%5===0, maj=i%15===0;
+    ms.appendChild(el("line",{x1:x,y1:84,x2:x,y2:maj?98:big?93:89,stroke:maj?"#E6E9EE":big?"#A9AFB8":"#4A4F57","stroke-width":maj?2:big?1.4:.8}));
+    if(maj){const t=el("text",{x:x,y:110,"text-anchor":"middle","font-family":"Michroma, sans-serif","font-size":9,fill:"#E6E9EE"});t.textContent=i;ms.appendChild(t);}
+  }
+  const hS=document.getElementById("hrShuttle"), mS=document.getElementById("minShuttle"), ro=document.getElementById("readout");
+  const bLive=document.getElementById("bLive"), bFast=document.getElementById("bFast");
+  let fast=false, base=0, simBase=0, last=Date.now(), prevM=null, prevH=null;
+  const busy=new WeakMap();
+  bLive.onclick=()=>{fast=false;bLive.setAttribute("aria-pressed","true");bFast.setAttribute("aria-pressed","false");};
+  bFast.onclick=()=>{base=Date.now();simBase=last;fast=true;bLive.setAttribute("aria-pressed","false");bFast.setAttribute("aria-pressed","true");};
+  function place(g,x,prev){
+    const now=performance.now();
+    if((busy.get(g)||0)>now) return false;
+    const fly = prev!==null && x < prev - 1;
+    if(fly) busy.set(g,now+1250);
+    g.style.transition = fly ? "transform 1.2s cubic-bezier(.65,0,.35,1)" : (fast ? "none" : "transform .25s ease-out");
+    g.style.transform = "translateX("+x+"px)";
+    return true;
+  }
+  function tick(){
+    const real=Date.now();
+    last = fast ? simBase+(real-base)*600 : real;
+    const d=new Date(last);
+    const sH=d.getMinutes()*60+d.getSeconds();
+    const mx=X0+L*Math.floor(sH/10)/360;
+    const s12=(d.getHours()%12)*3600+sH;
+    const hx=X0+L*Math.floor(s12/120)/360;
+    if(mx!==prevM&&place(mS,mx,prevM))prevM=mx;
+    if(hx!==prevH&&place(hS,hx,prevH))prevH=hx;
+    const p=n=>String(n).padStart(2,"0");
+    ro.textContent=p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds());
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+</body>
+</html>
